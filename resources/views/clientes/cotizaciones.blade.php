@@ -6,12 +6,7 @@
         <h2 class="page-title">Mis Cotizaciones</h2>
         <p class="page-description">Todas tus cotizaciones de servicio de grúa.</p>
     </div>
-    <a href="{{ route('cotizaciones.create') }}" class="btn-primary">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Nueva cotización
-    </a>
+
 </div>
 
 <div class="card mb-5">

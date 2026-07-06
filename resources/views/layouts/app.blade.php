@@ -165,12 +165,6 @@
 </div>
 <div class="mb-0.5">
 <div class="text-[10px] uppercase tracking-widest text-white/30 px-3 pt-2.5 pb-1.5 font-semibold">Servicios</div>
-<a href="{{ route('cotizaciones.create') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-white/55 hover:text-white/85 hover:bg-white/5 transition-all duration-150">
-<svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-</svg>
-<span>Solicitar cotización</span>
-</a>
 <a href="{{ route('clientes.cotizaciones') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 {{ request()->routeIs('clientes.cotizaciones') ? 'text-[#FFD500] nav-active' : 'text-white/55 hover:text-white/85 hover:bg-white/5' }}">
 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />

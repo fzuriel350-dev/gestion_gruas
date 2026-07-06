@@ -17,18 +17,7 @@ class DashboardController extends Controller
         $empresaId = session('empresa_id');
 
         if ($user->isCliente()) {
-            $misCotizaciones = Cotizacion::where('empresa_id', $empresaId)
-                ->where('created_by', $user->id)
-                ->count();
-            $misServicios = Servicio::where('empresa_id', $empresaId)
-                ->whereHas('cotizacion', fn($q) => $q->where('created_by', $user->id))
-                ->count();
-
-            return view('dashboard', [
-                'role' => 'cliente',
-                'mis_cotizaciones' => $misCotizaciones,
-                'mis_servicios' => $misServicios,
-            ]);
+            return redirect()->route('clientes.dashboard');
         }
 
         if ($user->isOperador()) {
