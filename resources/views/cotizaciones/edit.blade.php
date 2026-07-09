@@ -185,7 +185,13 @@
 </div>
 </div>
 </form>
-</div>@endsection@push('scripts')<script>function cotizacionForm() {    return {                init() {
+</div>
+@endsection
+@push('scripts')
+<script>
+function cotizacionForm() {
+    return {
+        init() {
             if (this.cliente_id) {
                 this.$nextTick(() => { this.filtrarAseguradoras(); this.filtrarConvenios(); });
             }
@@ -204,5 +210,8 @@
                 if (!opt.value) { opt.hidden = !this.aseguradora_id; continue; }
                 opt.hidden = opt.value !== this.aseguradora_id;
             }
-        },        filtrarConvenios() {            const sel = document.querySelector('[name="convenio_aplicado_id"]');            for (const opt of sel.options) {                if (!opt.value) { opt.hidden = false; continue; }                const asegId = opt.dataset.aseguradoraId || '';                opt.hidden = asegId !== this.aseguradora_id;            }        },        resetearConvenio() {            this.convenio_aplicado_id = '';            this.descuento_porcentaje = 0;            this.costo_banderazo = 0;            this.costo_km = 0;            this.km_incluidos = 0;            this.convenioNombre = '';            this.incluye_peajes = '0';            this.costo_aprox_casetas = 0;        },        actualizarConvenio() {            const sel = document.querySelector('[name="convenio_aplicado_id"]');            const opt = sel.options[sel.selectedIndex];            if (opt && opt.value) {                this.descuento_porcentaje = parseFloat(opt.dataset.descuento) || 0;                this.costo_banderazo = parseFloat(opt.dataset.costoBanderazo) || 0;                this.costo_km = parseFloat(opt.dataset.costoKm) || 0;                this.km_incluidos = parseInt(opt.dataset.kmIncluidos) || 0;                this.convenioNombre = opt.text;                if (parseInt(opt.dataset.cubreCasetas)) {                    this.incluye_peajes = '1';                }            } else {                this.descuento_porcentaje = 0;                this.costo_banderazo = 0;                this.costo_km = 0;                this.km_incluidos = 0;                this.convenioNombre = '';                this.incluye_peajes = '0';                this.costo_aprox_casetas = 0;            }        }    }
-</script>@endpush
+        },        filtrarConvenios() {            const sel = document.querySelector('[name="convenio_aplicado_id"]');            for (const opt of sel.options) {                if (!opt.value) { opt.hidden = false; continue; }                const asegId = opt.dataset.aseguradoraId || '';                opt.hidden = asegId !== this.aseguradora_id;            }        },        resetearConvenio() {            this.convenio_aplicado_id = '';            this.descuento_porcentaje = 0;            this.costo_banderazo = 0;            this.costo_km = 0;            this.km_incluidos = 0;            this.convenioNombre = '';            this.incluye_peajes = '0';            this.costo_aprox_casetas = 0;        },        actualizarConvenio() {            const sel = document.querySelector('[name="convenio_aplicado_id"]');            const opt = sel.options[sel.selectedIndex];            if (opt && opt.value) {                this.descuento_porcentaje = parseFloat(opt.dataset.descuento) || 0;                this.costo_banderazo = parseFloat(opt.dataset.costoBanderazo) || 0;                this.costo_km = parseFloat(opt.dataset.costoKm) || 0;                this.km_incluidos = parseInt(opt.dataset.kmIncluidos) || 0;                this.convenioNombre = opt.text;                if (parseInt(opt.dataset.cubreCasetas)) {                    this.incluye_peajes = '1';                }            } else {                this.descuento_porcentaje = 0;                this.costo_banderazo = 0;                this.costo_km = 0;                this.km_incluidos = 0;                this.convenioNombre = '';                this.incluye_peajes = '0';                this.costo_aprox_casetas = 0;            }        }
+    }
+}
+</script>
+@endpush

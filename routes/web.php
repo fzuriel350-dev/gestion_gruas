@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('servicios/{servicio}/avanzar', [ServicioController::class, 'avanzarEstado'])->name('servicios.avanzar');
     Route::post('servicios/{servicio}/liberar', [ServicioController::class, 'liberar'])->name('servicios.liberar');
     Route::post('servicios/{servicio}/cancelar', [ServicioController::class, 'cancelarPorCotizador'])->name('servicios.cancelar');
+    Route::post('servicios/{servicio}/asignar-operador', [ServicioController::class, 'asignarOperador'])->name('servicios.asignar-operador');
     Route::resource('usuarios', UserController::class);
 
     Route::get('notificaciones', [NotificacionController::class, 'index'])->name('notificaciones.index');

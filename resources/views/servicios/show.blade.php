@@ -19,6 +19,9 @@
     @if (auth()->user()->isOperador() && $servicio->operador_id === auth()->user()->empleado?->operador?->id)
     <button type="button" class="btn btn-ghost" style="background:#eab308;color:#000;" onclick="liberarServicio({{ $servicio->id }})">Liberar servicio</button>
     @endif
+    @if ((auth()->user()->isAdmin() || auth()->user()->isCotizador()) && !$servicio->operador_id && !in_array($servicio->estado, ['finalizado', 'cancelado']))
+    <button type="button" class="btn btn-primary" style="background:#16a34a;" onclick="asignarOperador({{ $servicio->id }})">Asignar operador</button>
+    @endif
 @endif
 </div>
 </div>
@@ -168,7 +171,7 @@ function liberarServicio(id) {
     Swal.fire({
         title: 'Liberar servicio',
         html: `
-            <p class="text-sm text-gray-500 mb-3">Selecciona el motivo por el que liberas el servicio. Se reasignará a otro operador disponible.</p>
+            <p class="text-sm text-gray-500 mb-3">Selecciona el motivo por el que liberas el servicio. Se notificará al cotizador para que asigne un nuevo operador.</p>
             <div class="space-y-3 text-left">
                 <div>
                     <label class="text-xs font-semibold text-gray-600">Motivo</label>
@@ -217,6 +220,71 @@ function liberarServicio(id) {
             form.appendChild(hiddenInput('_token', '{{ csrf_token() }}'));
             form.appendChild(hiddenInput('tipo_incidencia', result.value.tipo_incidencia));
             form.appendChild(hiddenInput('motivo_liberacion', result.value.motivo_liberacion));
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+function asignarOperador(id) {
+    const operadores = @json($operadores->map(fn($o) => ['id' => $o->id, 'nombre' => $o->empleado?->nombreCompleto(), 'disponible' => $o->disponible]));
+    const unidades = @json($unidades->map(fn($u) => ['id' => $u->id, 'name' => $u->marca . ' ' . $u->placas]));
+
+    let opcionesOp = operadores.filter(o => o.disponible).map(o => `<option value="${o.id}">${o.nombre}</option>`).join('');
+    let opcionesUn = '<option value="">— Sin unidad —</option>' + unidades.map(u => `<option value="${u.id}">${u.name}</option>`).join('');
+
+    Swal.fire({
+        title: 'Asignar operador',
+        html: `
+            <p class="text-sm text-gray-500 mb-3">Selecciona el operador que se hará cargo del servicio.</p>
+            <div class="space-y-3 text-left">
+                <div>
+                    <label class="text-xs font-semibold text-gray-600">Operador</label>
+                    <select id="operador_select" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-200 outline-none">
+                        ${opcionesOp || '<option value="">No hay operadores disponibles</option>'}
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-600">Unidad</label>
+                    <select id="unidad_select" class="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-blue-200 outline-none">
+                        ${opcionesUn}
+                    </select>
+                </div>
+            </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Asignar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#16a34a',
+        reverseButtons: true,
+        customClass: {
+            popup: 'swal-popup-custom',
+            title: 'swal-title-custom',
+            confirmButton: 'swal-confirm-custom',
+            cancelButton: 'swal-cancel-custom',
+        },
+        preConfirm: function() {
+            const operadorId = document.getElementById('operador_select')?.value;
+            if (!operadorId) {
+                Swal.showValidationMessage('Selecciona un operador');
+                return false;
+            }
+            return {
+                operador_id: operadorId,
+                unidad_id: document.getElementById('unidad_select')?.value || '',
+            };
+        }
+    }).then(function(result) {
+        if (result.isConfirmed) {
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/servicios/' + id + '/asignar-operador';
+            form.appendChild(hiddenInput('_token', '{{ csrf_token() }}'));
+            form.appendChild(hiddenInput('operador_id', result.value.operador_id));
+            if (result.value.unidad_id) {
+                form.appendChild(hiddenInput('unidad_id', result.value.unidad_id));
+            }
             document.body.appendChild(form);
             form.submit();
         }
@@ -373,13 +441,13 @@ function avanzarEtapa(id, estadoActual) {
         }
     });
 
-    function hiddenInput(name, value) {
-        var inp = document.createElement('input');
-        inp.type = 'hidden';
-        inp.name = name;
-        inp.value = value;
-        return inp;
-    }
+}
+function hiddenInput(name, value) {
+    var inp = document.createElement('input');
+    inp.type = 'hidden';
+    inp.name = name;
+    inp.value = value;
+    return inp;
 }
 </script>
 

@@ -9,6 +9,8 @@ use App\Models\TipoServicio;
 use App\Models\Unidad;
 use App\Models\Oficina;
 use App\Models\AutorizacionCancelacion;
+use App\Models\Notificacion;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ServicioController extends Controller
@@ -150,7 +152,15 @@ class ServicioController extends Controller
             default => 1,
         };
 
-        return view('servicios.show', compact('servicio', 'progreso'));
+        $operadores = Operador::where('empresa_id', session('empresa_id'))
+            ->with('empleado')
+            ->get();
+
+        $unidades = Unidad::where('empresa_id', session('empresa_id'))
+            ->where('activo', true)
+            ->get();
+
+        return view('servicios.show', compact('servicio', 'progreso', 'operadores', 'unidades'));
     }
 
     public function edit(Servicio $servicio)
@@ -309,22 +319,85 @@ class ServicioController extends Controller
             'fecha_resolucion' => now(),
         ]);
 
-        $nuevoOperador = Operador::where('empresa_id', session('empresa_id'))
-            ->where('disponible', true)
-            ->where('id', '!=', $operadorActual?->id)
-            ->inRandomOrder()
-            ->first();
+        $usuarios = User::where('empresa_id', session('empresa_id'))
+            ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
+            ->get();
 
-        if ($nuevoOperador) {
-            $servicio->update(['operador_id' => $nuevoOperador->id]);
-            $nuevoOperador->update(['disponible' => false]);
-
-            return redirect()->route('servicios.show', $servicio)
-                ->with('success', "Servicio liberado y reasignado a {$nuevoOperador->empleado?->nombre}.");
+        foreach ($usuarios as $u) {
+            Notificacion::create([
+                'empresa_id' => session('empresa_id'),
+                'usuario_id' => $u->id,
+                'mensaje' => "El operador {$operadorActual?->empleado?->nombreCompleto()} liberó el servicio #{$servicio->id}. Motivo: {$data['motivo_liberacion']}. Se necesita asignar un nuevo operador.",
+                'canal' => 'sistema',
+                'tipo' => 'servicio',
+                'estado' => 'no_leida',
+            ]);
         }
 
         return redirect()->route('servicios.show', $servicio)
-            ->with('warning', 'Servicio liberado. No hay operadores disponibles para reasignar. Asigna uno manualmente.');
+            ->with('warning', 'Servicio liberado. El cotizador recibió una notificación para asignar un nuevo operador.');
+    }
+
+    public function asignarOperador(Request $request, Servicio $servicio)
+    {
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isCotizador()) {
+            abort(403);
+        }
+
+        if ($servicio->operador_id) {
+            return back()->with('error', 'El servicio ya tiene un operador asignado.');
+        }
+
+        if (in_array($servicio->estado, ['finalizado', 'cancelado'])) {
+            return back()->with('error', 'No se puede asignar operador a un servicio finalizado o cancelado.');
+        }
+
+        $data = $request->validate([
+            'operador_id' => ['required', 'exists:operadores,id'],
+            'unidad_id' => ['nullable', 'exists:unidades,id'],
+        ]);
+
+        $operador = Operador::where('empresa_id', session('empresa_id'))
+            ->where('id', $data['operador_id'])
+            ->firstOrFail();
+
+        if (!$operador->disponible) {
+            return back()->with('error', 'El operador seleccionado no está disponible.');
+        }
+
+        if (!empty($data['unidad_id'])) {
+            $unidad = Unidad::where('empresa_id', session('empresa_id'))
+                ->where('id', $data['unidad_id'])
+                ->firstOrFail();
+            if (!$unidad->activo) {
+                return back()->with('error', 'La unidad seleccionada no está disponible.');
+            }
+        }
+
+        $servicio->update([
+            'operador_id' => $operador->id,
+            'unidad_id' => $data['unidad_id'] ?? null,
+            'estado' => 'en_proceso',
+        ]);
+
+        $operador->update(['disponible' => false]);
+
+        if (!empty($data['unidad_id'])) {
+            $unidad->update(['disponible' => false]);
+        }
+
+        Notificacion::create([
+            'empresa_id' => session('empresa_id'),
+            'usuario_id' => $operador->user_id ?? null,
+            'mensaje' => "Se te ha asignado al servicio #{$servicio->id}. Cliente: {$servicio->cotizacion?->cliente?->nombre}.",
+            'canal' => 'sistema',
+            'tipo' => 'servicio',
+            'estado' => 'no_leida',
+        ]);
+
+        return redirect()->route('servicios.show', $servicio)
+            ->with('success', "Operador {$operador->empleado?->nombre} asignado al servicio.");
     }
 
     public function cancelarPorCotizador(Request $request, Servicio $servicio)
