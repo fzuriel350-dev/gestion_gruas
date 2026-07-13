@@ -43,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('unidades', UnidadController::class);
     Route::resource('oficinas', OficinaController::class);
     Route::resource('autorizaciones-cancelacion', AutorizacionCancelacionController::class);
-    Route::resource('facturas', FacturaController::class);
+    Route::resource('facturas', FacturaController::class)->only('index', 'show', 'destroy');
     Route::get('facturas/{factura}/descargar-pdf', [FacturaController::class, 'descargarPdf'])->name('facturas.descargar-pdf');
     Route::resource('convenios', ConvenioController::class);
     Route::get('convenios/aseguradora/{aseguradora}/tipos', [ConvenioController::class, 'tiposPorAseguradora'])->name('convenios.tipos-por-aseguradora');
@@ -74,6 +74,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/notificaciones/leer-todas', [ClientePanelController::class, 'notificacionesLeerTodas'])->name('notificaciones.leer-todas');
         Route::get('/perfil', [ClientePanelController::class, 'perfil'])->name('perfil');
         Route::post('/perfil', [ClientePanelController::class, 'updatePerfil'])->name('perfil.update');
+    });
+
+    Route::prefix('cotizador')->name('cotizador.')->group(function () {
+        Route::get('/notificaciones', [NotificacionController::class, 'cotizadorIndex'])->name('notificaciones');
+        Route::post('/notificaciones/{notificacione}/leer', [NotificacionController::class, 'cotizadorMarcarLeida'])->name('notificaciones.leer');
+        Route::post('/notificaciones/leer-todas', [NotificacionController::class, 'cotizadorMarcarTodasLeidas'])->name('notificaciones.leer-todas');
+    });
+
+    Route::prefix('operador')->name('operador.')->group(function () {
+        Route::get('/notificaciones', [NotificacionController::class, 'operadorIndex'])->name('notificaciones');
+        Route::post('/notificaciones/{notificacione}/leer', [NotificacionController::class, 'operadorMarcarLeida'])->name('notificaciones.leer');
+        Route::post('/notificaciones/leer-todas', [NotificacionController::class, 'operadorMarcarTodasLeidas'])->name('notificaciones.leer-todas');
     });
 });
 

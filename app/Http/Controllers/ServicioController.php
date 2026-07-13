@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Empresa;
 use App\Models\Servicio;
 use App\Models\Cotizacion;
 use App\Models\Factura;
@@ -141,30 +142,36 @@ class ServicioController extends Controller
 
         Operador::where('id', $data['operador_id'])->update(['disponible' => false]);
 
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
         $empleados = User::where('empresa_id', session('empresa_id'))
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $emp->id,
-                'mensaje' => "Servicio #{$servicio->id} creado y asignado al operador.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "Servicio #{$servicio->id} creado y asignado al operador.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
         $cotizacion = $servicio->cotizacion;
         if ($cotizacion && $cotizacion->usuario_creador_id) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $cotizacion->usuario_creador_id,
-                'mensaje' => "Tu servicio #{$servicio->id} ha sido creado. Folio cotización: {$cotizacion->folio}.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $cotizacion->usuario_creador_id,
+                    'mensaje' => "Tu servicio #{$servicio->id} ha sido creado. Folio cotización: {$cotizacion->folio}.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$cotizacion->usuario_creador_id}");
         }
 
@@ -307,30 +314,36 @@ class ServicioController extends Controller
                 'finalizado' => "El servicio #{$servicio->id} ha sido finalizado.",
             ];
 
+            $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
             $empleados = User::where('empresa_id', session('empresa_id'))
                 ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
                 ->get();
 
             foreach ($empleados as $emp) {
-                Notificacion::create([
-                    'empresa_id' => session('empresa_id'),
-                    'usuario_id' => $emp->id,
-                    'mensaje' => $mensajeMap[$nuevoEstado],
-                    'tipo' => 'servicio',
-                    'estado' => 'no_leida',
-                ]);
+                if ($notificacionesEnabled) {
+                    Notificacion::create([
+                        'empresa_id' => session('empresa_id'),
+                        'usuario_id' => $emp->id,
+                        'mensaje' => $mensajeMap[$nuevoEstado],
+                        'tipo' => 'servicio',
+                        'estado' => 'no_leida',
+                    ]);
+                }
                 Cache::forget("notificaciones_no_leidas_{$emp->id}");
             }
 
             $cotizacion = $servicio->cotizacion;
             if ($cotizacion && $cotizacion->usuario_creador_id) {
-                Notificacion::create([
-                    'empresa_id' => session('empresa_id'),
-                    'usuario_id' => $cotizacion->usuario_creador_id,
-                    'mensaje' => $mensajeMap[$nuevoEstado],
-                    'tipo' => 'servicio',
-                    'estado' => 'no_leida',
-                ]);
+                if ($notificacionesEnabled) {
+                    Notificacion::create([
+                        'empresa_id' => session('empresa_id'),
+                        'usuario_id' => $cotizacion->usuario_creador_id,
+                        'mensaje' => $mensajeMap[$nuevoEstado],
+                        'tipo' => 'servicio',
+                        'estado' => 'no_leida',
+                    ]);
+                }
                 Cache::forget("notificaciones_no_leidas_{$cotizacion->usuario_creador_id}");
             }
         }
@@ -377,6 +390,7 @@ class ServicioController extends Controller
         }
 
         AutorizacionCancelacion::create([
+            'empresa_id' => session('empresa_id'),
             'servicio_id' => $servicio->id,
             'usuario_solicitante_id' => $user->id,
             'usuario_resolutor_id' => $user->id,
@@ -391,15 +405,20 @@ class ServicioController extends Controller
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
         foreach ($usuarios as $u) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $u->id,
-                'mensaje' => "El operador {$operadorActual?->empleado?->nombreCompleto()} liberó el servicio #{$servicio->id}. Motivo: {$data['motivo_liberacion']}. Se necesita asignar un nuevo operador.",
-                'canal' => 'sistema',
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $u->id,
+                    'mensaje' => "El operador {$operadorActual?->empleado?->nombreCompleto()} liberó el servicio #{$servicio->id}. Motivo: {$data['motivo_liberacion']}. Se necesita asignar un nuevo operador.",
+                    'canal' => 'sistema',
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
+            Cache::forget("notificaciones_no_leidas_{$u->id}");
         }
 
         return redirect()->route('servicios.show', $servicio)
@@ -446,7 +465,7 @@ class ServicioController extends Controller
         $servicio->update([
             'operador_id' => $operador->id,
             'unidad_id' => $data['unidad_id'] ?? null,
-            'estado' => 'en_proceso',
+            'estado' => 'asignado',
         ]);
 
         $operador->update(['disponible' => false]);
@@ -455,39 +474,47 @@ class ServicioController extends Controller
             $unidad->update(['disponible' => false]);
         }
 
-        Notificacion::create([
-            'empresa_id' => session('empresa_id'),
-            'usuario_id' => $operador->user_id ?? null,
-            'mensaje' => "Se te ha asignado al servicio #{$servicio->id}. Cliente: {$servicio->cotizacion?->cliente?->nombre}.",
-            'canal' => 'sistema',
-            'tipo' => 'servicio',
-            'estado' => 'no_leida',
-        ]);
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
+        if ($notificacionesEnabled) {
+            Notificacion::create([
+                'empresa_id' => session('empresa_id'),
+                'usuario_id' => $operador->user_id ?? null,
+                'mensaje' => "Se te ha asignado al servicio #{$servicio->id}. Cliente: {$servicio->cotizacion?->cliente?->nombre}.",
+                'canal' => 'sistema',
+                'tipo' => 'servicio',
+                'estado' => 'no_leida',
+            ]);
+        }
 
         $empleados = User::where('empresa_id', session('empresa_id'))
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $emp->id,
-                'mensaje' => "Operador {$operador->empleado?->nombre} asignado al servicio #{$servicio->id}.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "Operador {$operador->empleado?->nombre} asignado al servicio #{$servicio->id}.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
         $cotizacion = $servicio->cotizacion;
         if ($cotizacion && $cotizacion->usuario_creador_id) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $cotizacion->usuario_creador_id,
-                'mensaje' => "Operador {$operador->empleado?->nombre} fue asignado a tu servicio #{$servicio->id}.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $cotizacion->usuario_creador_id,
+                    'mensaje' => "Operador {$operador->empleado?->nombre} fue asignado a tu servicio #{$servicio->id}.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$cotizacion->usuario_creador_id}");
         }
 
@@ -518,6 +545,7 @@ class ServicioController extends Controller
         }
 
         AutorizacionCancelacion::create([
+            'empresa_id' => session('empresa_id'),
             'servicio_id' => $servicio->id,
             'usuario_solicitante_id' => $user->id,
             'usuario_resolutor_id' => $user->id,
@@ -530,13 +558,16 @@ class ServicioController extends Controller
 
         $cotizacion = $servicio->cotizacion;
         if ($cotizacion && $cotizacion->usuario_creador_id) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $cotizacion->usuario_creador_id,
-                'mensaje' => "Tu servicio #{$servicio->id} fue cancelado. Motivo: {$data['motivo_cancelacion']}.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $cotizacion->usuario_creador_id,
+                    'mensaje' => "Tu servicio #{$servicio->id} fue cancelado. Motivo: {$data['motivo_cancelacion']}.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$cotizacion->usuario_creador_id}");
         }
 
@@ -596,25 +627,31 @@ class ServicioController extends Controller
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $emp->id,
-                'mensaje' => "Factura {$folio} generada para el servicio #{$servicio->id}. Total: \${$total}.",
-                'tipo' => 'factura',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "Factura {$folio} generada para el servicio #{$servicio->id}. Total: \${$total}.",
+                    'tipo' => 'factura',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
         if ($cotizacion && $cotizacion->usuario_creador_id) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $cotizacion->usuario_creador_id,
-                'mensaje' => "Factura {$folio} generada para tu servicio #{$servicio->id}. Total: \${$total}.",
-                'tipo' => 'factura',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $cotizacion->usuario_creador_id,
+                    'mensaje' => "Factura {$folio} generada para tu servicio #{$servicio->id}. Total: \${$total}.",
+                    'tipo' => 'factura',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$cotizacion->usuario_creador_id}");
         }
 

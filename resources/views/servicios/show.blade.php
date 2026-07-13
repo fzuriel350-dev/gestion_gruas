@@ -110,11 +110,11 @@ $pasos = [
 </div>
 <div>
 <span class="text-gray-500">Inicio</span>
-<p class="font-semibold">{{ $servicio->fecha_inicio?->format('d/m/Y H:i') ?: '—' }}</p>
+<p class="font-semibold">{{ $servicio->fecha_inicio?->format($fechaHoraFormato) ?: '—' }}</p>
 </div>
 <div>
 <span class="text-gray-500">Fin</span>
-<p class="font-semibold">{{ $servicio->fecha_fin?->format('d/m/Y H:i') ?: '—' }}</p>
+<p class="font-semibold">{{ $servicio->fecha_fin?->format($fechaHoraFormato) ?: '—' }}</p>
 </div>
 @if ($servicio->descripcion)
 <div class="col-span-2">
@@ -165,12 +165,12 @@ $pasos = [
 </div>
 <div>
 <span class="text-gray-500">Costo final real</span>
-<p class="font-semibold">${{ $servicio->costo_final_real ? number_format($servicio->costo_final_real, 2) : '—' }}</p>
+<p class="font-semibold">{{ $empresa && $empresa->mostrar_precios ? ($servicio->costo_final_real ? $moneda . number_format($servicio->costo_final_real, 2) : '—') : '••••' }}</p>
 </div>
 @if ($servicio->cargos_extras > 0)
 <div class="col-span-2 p-3 rounded-lg bg-amber-50 border border-amber-200">
 <div class="flex items-center gap-2">
-<span class="text-sm font-bold text-amber-700">Cargo extra KM: ${{ number_format($servicio->cargos_extras, 2) }}</span>
+<span class="text-sm font-bold text-amber-700">Cargo extra KM: {{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($servicio->cargos_extras, 2) : '••••' }}</span>
 </div>
 @if ($servicio->motivo_cargos_extras)
 <p class="text-xs text-gray-500 mt-1">{{ $servicio->motivo_cargos_extras }}</p>

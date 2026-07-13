@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @if($empresa && $empresa->modo_oscuro) class="dark" @endif>
+<html lang="{{ $empresa && $empresa->idioma ? str_replace('_', '-', $empresa->idioma) : str_replace('_', '-', app()->getLocale()) }}" @if($empresa && $empresa->modo_oscuro) class="dark" @endif>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,7 +46,7 @@
         {{-- Brand --}}
         <div class="flex items-center gap-3.5 px-5 pt-5 pb-4">
             <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center shrink-0 overflow-hidden" style="background: linear-gradient(135deg, var(--geg-yellow), var(--geg-yellow-dark));">
-                @if ($empresa->logo)
+                @if ($empresa && $empresa->logo)
                     <img src="{{ Storage::url($empresa->logo) }}" alt="{{ $empresa->nombre }}" class="w-full h-full object-contain p-1">
                 @else
                     <svg class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,6 +168,31 @@
                     <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     <span>Servicios activos</span>
                 </a>
+                <a href="{{ route('operador.notificaciones') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 {{ request()->routeIs('operador.notificaciones*') ? 'nav-active' : 'text-white/55 hover:text-white/85 hover:bg-white/5' }}">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span>Notificaciones</span>
+                    @if ($noLeidas > 0)<span class="ml-auto bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">{{ $noLeidas > 99 ? '99+' : $noLeidas }}</span>@endif
+                </a>
+            </div>
+            @endif
+
+            {{-- Cotizador --}}
+            @if ($isCotizador)
+            <div class="mb-0.5">
+                <div class="text-xs uppercase tracking-widest text-white/50 px-3 pt-3 pb-1.5 font-bold">Cotizaciones</div>
+                <a href="{{ route('cotizaciones.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 {{ request()->routeIs('cotizaciones.*') ? 'nav-active' : 'text-white/55 hover:text-white/85 hover:bg-white/5' }}">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <span>Mis cotizaciones</span>
+                </a>
+                <a href="{{ route('servicios.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 {{ request()->routeIs('servicios.*') ? 'nav-active' : 'text-white/55 hover:text-white/85 hover:bg-white/5' }}">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    <span>Servicios</span>
+                </a>
+                <a href="{{ route('cotizador.notificaciones') }}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 {{ request()->routeIs('cotizador.notificaciones*') ? 'nav-active' : 'text-white/55 hover:text-white/85 hover:bg-white/5' }}">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span>Notificaciones</span>
+                    @if ($noLeidas > 0)<span class="ml-auto bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-semibold">{{ $noLeidas > 99 ? '99+' : $noLeidas }}</span>@endif
+                </a>
             </div>
             @endif
 
@@ -240,7 +265,7 @@
             @endif
 
             <div class="flex items-center gap-4 shrink-0">
-                <a href="{{ $isCliente ? route('clientes.notificaciones') : route('notificaciones.index') }}" class="relative w-9 h-9 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-base hover-topbar transition-all">
+                <a href="@if($isCliente){{ route('clientes.notificaciones') }}@elseif($isCotizador){{ route('cotizador.notificaciones') }}@elseif($isOperador){{ route('operador.notificaciones') }}@else{{ route('notificaciones.index') }}@endif" class="relative w-9 h-9 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-center text-base hover-topbar transition-all">
                     <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
                     @if ($noLeidas > 0)
                         <span class="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-white">{{ $noLeidas > 99 ? '99+' : $noLeidas }}</span>

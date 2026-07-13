@@ -94,7 +94,7 @@
                             </td>
                             <td class="text-gray-600">{{ $servicio->operador?->empleado?->nombre ?? '—' }}</td>
                             <td class="text-gray-600">{{ $servicio->unidad?->numero_economico ?? '—' }}</td>
-                            <td class="text-gray-500 text-sm">{{ $servicio->created_at->format('d/m/Y H:i') }}</td>
+                            <td class="text-gray-500 text-sm">{{ $servicio->created_at->format($fechaHoraFormato) }}</td>
                             <td>
                                 <a href="{{ route('clientes.servicio-show', $servicio) }}" class="btn-icon" title="Ver detalle">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

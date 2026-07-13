@@ -103,7 +103,7 @@ class UnidadController extends Controller
 
     public function destroy(Unidad $unidad)
     {
-        $this->authorize('empleado');
+        $this->authorize('admin');
         $unidad->delete();
         return redirect()->route('unidades.index')->with('success', 'Unidad eliminada.');
     }

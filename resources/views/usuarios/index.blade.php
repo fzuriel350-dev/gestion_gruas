@@ -49,11 +49,11 @@
                             </span>
                         </td>
                         <td>{{ $u->empleado?->nombreCompleto() ?: '—' }}</td>
-                        <td class="text-sm text-gray-500">{{ $u->created_at->format('d/m/Y') }}</td>
+                        <td class="text-sm text-gray-500">{{ $u->created_at->format($fechaFormato) }}</td>
                         <td>
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('usuarios.edit', $u) }}" class="btn btn-sm btn-primary">Editar</a>
-                                @if ($u->id !== auth()->id())
+                                @if ($u->id !== auth()->id() && $u->wasCreatedBy(auth()->id()))
                                 <form method="POST" action="{{ route('usuarios.destroy', $u) }}" class="inline"
                                     x-data
                                     x-on:submit.prevent="Swal.fire({

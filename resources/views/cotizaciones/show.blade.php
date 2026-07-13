@@ -82,7 +82,7 @@
             @endif
             <div class="text-xs text-gray-400 flex gap-4">
 <span>Creado por: {{ $cotizacione->creador?->name }}</span>
-<span>{{ $cotizacione->created_at->format('d/m/Y H:i') }}</span>
+<span>{{ $cotizacione->created_at->format($fechaHoraFormato) }}</span>
 </div>
 </div>
 <div class="space-y-5">
@@ -94,19 +94,19 @@
 <div class="cost-summary">
 <div class="cost-row">
 <span>Banderazo</span>
-<span>${{ number_format($cotizacione->costo_banderazo, 2) }}</span>
+<span>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacione->costo_banderazo, 2) : '••••' }}</span>
 </div>
 <div class="cost-row">
-<span>Kilometraje ({{ number_format($cotizacione->distancia_km, 1) }} km × ${{ number_format($cotizacione->costo_km, 2) }}/km)</span>
-<span>${{ number_format($cotizacione->distancia_km * $cotizacione->costo_km, 2) }}</span>
+<span>Kilometraje ({{ number_format($cotizacione->distancia_km, 1) }} km × {{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacione->costo_km, 2) : '••••' }}/km)</span>
+<span>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacione->distancia_km * $cotizacione->costo_km, 2) : '••••' }}</span>
 </div>
 <div class="cost-row">
 <span>Casetas</span>
-<span>${{ number_format($cotizacione->costo_aprox_casetas, 2) }}</span>
+<span>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacione->costo_aprox_casetas, 2) : '••••' }}</span>
 </div>
 <div class="cost-row total">
 <span>Total estimado</span>
-<span>${{ number_format($cotizacione->costo_total, 2) }}</span>
+<span>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacione->costo_total, 2) : '••••' }}</span>
 </div>
 </div>
 </div>

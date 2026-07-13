@@ -22,6 +22,7 @@ class User extends Authenticatable
         'role',
         'empresa_id',
         'empleado_id',
+        'created_by',
     ];
 
     protected $hidden = [
@@ -95,5 +96,15 @@ class User extends Authenticatable
     public function resolucionesCancelacion()
     {
         return $this->hasMany(AutorizacionCancelacion::class, 'usuario_resolutor_id');
+    }
+
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function wasCreatedBy(?int $userId): bool
+    {
+        return $this->created_by === $userId;
     }
 }

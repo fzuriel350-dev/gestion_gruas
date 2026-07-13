@@ -78,16 +78,16 @@
 </div>
 <div>
 <span class="text-gray-500">Creado</span>
-<p class="font-semibold mt-0.5">{{ $empleado->created_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $empleado->created_at->format($fechaHoraFormato) }}</p>
 </div>
 <div>
 <span class="text-gray-500">Actualizado</span>
-<p class="font-semibold mt-0.5">{{ $empleado->updated_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $empleado->updated_at->format($fechaHoraFormato) }}</p>
 </div>
 @if ($empleado->trashed())
 <div>
 <span class="text-gray-500">Eliminado</span>
-<p class="font-semibold mt-0.5 text-red-600">{{ $empleado->deleted_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5 text-red-600">{{ $empleado->deleted_at->format($fechaHoraFormato) }}</p>
 </div>
 @endif
 </div>

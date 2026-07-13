@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class AutorizacionCancelacion extends Model
 {
+    use Traits\BelongsToEmpresa;
+
     protected $table = 'autorizaciones_cancelacion';
 
     protected $fillable = [
+        'empresa_id',
         'servicio_id',
         'usuario_solicitante_id',
         'usuario_resolutor_id',

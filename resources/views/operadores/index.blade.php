@@ -24,8 +24,8 @@
 <strong>{{ $o->empleado?->nombreCompleto() }}</strong>
 </td>
 <td>{{ $o->licencia_tipo }}</td>
-<td>{{ $o->licencia_año_vencimiento?->format('d/m/Y') ?: '—' }}</td>
-<td>{{ $o->licencia_vencimiento_federal?->format('d/m/Y') ?: '—' }}</td>
+<td>{{ $o->licencia_año_vencimiento?->format($fechaFormato) ?: '—' }}</td>
+<td>{{ $o->licencia_vencimiento_federal?->format($fechaFormato) ?: '—' }}</td>
 <td>{{ $o->puntos_acumulados ?? 0 }}</td>
 <td>{{ $o->unidades->count() }}</td>
 <td>                            @if ($o->disponible)                                <span class="status status-success">

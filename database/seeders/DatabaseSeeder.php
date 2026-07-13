@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
             'empleado_id' => $adminEmp->id,
             'name' => 'Administrador',
             'email' => 'admin@gruas.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('contraseña'),
             'role' => 'admin',
         ]);
 
@@ -93,7 +93,7 @@ class DatabaseSeeder extends Seeder
             'empleado_id' => $cotEmp->id,
             'name' => 'Carlos López',
             'email' => 'cotizador@gruas.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('contraseña'),
             'role' => 'cotizador',
         ]);
 
@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
             'empleado_id' => $op1Emp->id,
             'name' => 'Luis Hernández',
             'email' => 'luis@gruas.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('contraseña'),
             'role' => 'operador',
         ]);
 
@@ -147,7 +147,7 @@ class DatabaseSeeder extends Seeder
             'empleado_id' => $op2Emp->id,
             'name' => 'María Torres',
             'email' => 'maria@gruas.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('contraseña'),
             'role' => 'operador',
         ]);
 
@@ -342,7 +342,7 @@ class DatabaseSeeder extends Seeder
             'empleado_id' => null,
             'name' => 'Juan Pérez',
             'email' => 'cliente@gruas.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('contraseña'),
             'role' => 'cliente',
         ]);
 

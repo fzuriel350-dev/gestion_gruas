@@ -57,7 +57,7 @@
 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
 </svg>
-{{ now()->format('d/m/Y') }}
+{{ now()->format($fechaFormato) }}
 </span>
 </div>
 </div>
@@ -221,7 +221,7 @@ Activo
 </svg>
 </div>
 <div class="stat-info">
-<div class="stat-value">${{ number_format($stats['ingresos_mes']) }}</div>
+<div class="stat-value">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($stats['ingresos_mes']) : '••••' }}</div>
 <div class="stat-label">Ingresos del mes</div>
 <div class="stat-trend up">+12.5% vs mayo</div>
 </div>

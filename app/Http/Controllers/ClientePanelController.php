@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AutorizacionCancelacion;
 use App\Models\Cliente;
 use App\Models\Cotizacion;
+use App\Models\Empresa;
 use App\Models\Servicio;
 use App\Models\Notificacion;
 use App\Models\User;
@@ -103,26 +104,31 @@ class ClientePanelController extends Controller
         ]);
 
         AutorizacionCancelacion::create([
+            'empresa_id' => session('empresa_id'),
             'servicio_id' => $servicio->id,
-            'usuario_solicitante_id' => $user->id,
+            'usuario_solicitante_id' => auth()->id(),
             'motivo_cancelacion' => $request->motivo,
             'tipo_incidencia' => 'cliente_cancela',
             'estatus' => 'pendiente',
             'fecha_solicitud' => now(),
         ]);
 
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
         $empleados = User::where('empresa_id', session('empresa_id'))
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $emp->id,
-                'mensaje' => "El cliente solicitó cancelar el servicio #{$servicio->id}. Motivo: {$request->motivo}.",
-                'tipo' => 'servicio',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "El cliente solicitó cancelar el servicio #{$servicio->id}. Motivo: {$request->motivo}.",
+                    'tipo' => 'servicio',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
@@ -178,26 +184,32 @@ class ClientePanelController extends Controller
             'descripcion' => 'Servicio generado por aprobación de cotización.',
         ]);
 
-        Notificacion::create([
-            'empresa_id' => $cotizacione->empresa_id,
-            'usuario_id' => $user->id,
-            'mensaje' => "Cotización {$cotizacione->folio} aprobada. Servicio generado.",
-            'tipo' => 'cotizacion_aprobada',
-            'estado' => 'no_leida',
-        ]);
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
+        if ($notificacionesEnabled) {
+            Notificacion::create([
+                'empresa_id' => $cotizacione->empresa_id,
+                'usuario_id' => $user->id,
+                'mensaje' => "Cotización {$cotizacione->folio} aprobada. Servicio generado.",
+                'tipo' => 'cotizacion_aprobada',
+                'estado' => 'no_leida',
+            ]);
+        }
 
         $empleados = User::where('empresa_id', $cotizacione->empresa_id)
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => $cotizacione->empresa_id,
-                'usuario_id' => $emp->id,
-                'mensaje' => "El cliente aprobó la cotización {$cotizacione->folio}. Se generó un servicio.",
-                'tipo' => 'cotizacion_aprobada',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => $cotizacione->empresa_id,
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "El cliente aprobó la cotización {$cotizacione->folio}. Se generó un servicio.",
+                    'tipo' => 'cotizacion_aprobada',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
@@ -217,26 +229,32 @@ class ClientePanelController extends Controller
 
         $cotizacione->update(['estatus' => 'rechazado']);
 
-        Notificacion::create([
-            'empresa_id' => $cotizacione->empresa_id,
-            'usuario_id' => $user->id,
-            'mensaje' => "Cotización {$cotizacione->folio} rechazada.",
-            'tipo' => 'cotizacion_rechazada',
-            'estado' => 'no_leida',
-        ]);
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
+        if ($notificacionesEnabled) {
+            Notificacion::create([
+                'empresa_id' => $cotizacione->empresa_id,
+                'usuario_id' => $user->id,
+                'mensaje' => "Cotización {$cotizacione->folio} rechazada.",
+                'tipo' => 'cotizacion_rechazada',
+                'estado' => 'no_leida',
+            ]);
+        }
 
         $empleados = User::where('empresa_id', $cotizacione->empresa_id)
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
         foreach ($empleados as $emp) {
-            Notificacion::create([
-                'empresa_id' => $cotizacione->empresa_id,
-                'usuario_id' => $emp->id,
-                'mensaje' => "El cliente rechazó la cotización {$cotizacione->folio}.",
-                'tipo' => 'cotizacion_rechazada',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => $cotizacione->empresa_id,
+                    'usuario_id' => $emp->id,
+                    'mensaje' => "El cliente rechazó la cotización {$cotizacione->folio}.",
+                    'tipo' => 'cotizacion_rechazada',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$emp->id}");
         }
 
@@ -257,8 +275,8 @@ class ClientePanelController extends Controller
             $q = $request->q;
             $query->where(function ($qq) use ($q) {
                 $qq->where('folio', 'like', "%{$q}%")
-                    ->orWhere('origen', 'like', "%{$q}%")
-                    ->orWhere('destino', 'like', "%{$q}%");
+                    ->orWhere('origen_direccion', 'like', "%{$q}%")
+                    ->orWhere('destino_direccion', 'like', "%{$q}%");
             });
         }
         if ($request->filled('estatus')) {
@@ -280,12 +298,11 @@ class ClientePanelController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
-        $data = $request->only(['name', 'email']);
+        $data = $request->only(['email']);
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }

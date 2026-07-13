@@ -44,8 +44,8 @@ La aplicación se abrirá en `http://localhost:8000`.
 
 | Rol | Email | Contraseña |
 |------|-------|-----------|
-| Administrador | admin@gruas.com | password |
-| Cotizador | cotizador@gruas.com | password |
-| Operador | luis@gruas.com | password |
-| Operador | maria@gruas.com | password |
-| Cliente | cliente@gruas.com | password |
+| Administrador | admin@gruas.com | contraseña |
+| Cotizador | cotizador@gruas.com | contraseña |
+| Operador | luis@gruas.com | contraseña |
+| Operador | maria@gruas.com | contraseña |
+| Cliente | cliente@gruas.com | contraseña |

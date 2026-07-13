@@ -51,11 +51,11 @@
 </div>
 <div>
 <span class="text-gray-500">Fecha de Solicitud</span>
-<p class="font-semibold mt-0.5">{{ $autorizacionCancelacion->fecha_solicitud?->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $autorizacionCancelacion->fecha_solicitud?->format($fechaHoraFormato) }}</p>
 </div>
 <div>
 <span class="text-gray-500">Fecha de Resolución</span>
-<p class="font-semibold mt-0.5">{{ $autorizacionCancelacion->fecha_resolucion?->format('d/m/Y H:i') ?: '—' }}</p>
+<p class="font-semibold mt-0.5">{{ $autorizacionCancelacion->fecha_resolucion?->format($fechaHoraFormato) ?: '—' }}</p>
 </div>
 </div>
 <div class="mt-5 p-4 rounded-lg bg-gray-50">

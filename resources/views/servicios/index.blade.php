@@ -48,8 +48,8 @@
 <span class="status-dot">
 </span>                                {{ str_replace('_', ' ', ucfirst($s->estado)) }}                            </span>
 </td>
-<td>{{ $s->fecha_inicio?->format('d/m/Y H:i') ?: '—' }}</td>
-<td>{{ $s->fecha_fin?->format('d/m/Y H:i') ?: '—' }}</td>
+<td>{{ $s->fecha_inicio?->format($fechaHoraFormato) ?: '—' }}</td>
+<td>{{ $s->fecha_fin?->format($fechaHoraFormato) ?: '—' }}</td>
 <td>
 <div class="flex items-center gap-2">
 <a href="{{ route('servicios.show', $s) }}" class="btn btn-sm btn-secondary">Ver</a>                                @if ((auth()->user()->isAdmin() || auth()->user()->isCotizador()) && !in_array($s->estado, ['finalizado', 'cancelado']))                                <a href="{{ route('servicios.edit', $s) }}" class="btn btn-sm btn-primary">Editar</a>                                @endif                            </div>

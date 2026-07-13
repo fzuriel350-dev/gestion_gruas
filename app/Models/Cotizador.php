@@ -35,9 +35,4 @@ class Cotizador extends Model
     {
         return $this->belongsTo(Empleado::class);
     }
-
-    public function servicios(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Servicio::class);
-    }
 }

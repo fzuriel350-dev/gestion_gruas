@@ -38,7 +38,7 @@
 </span> Sí</span>                            @else                                <span class="status status-pending">
 <span class="status-dot">
 </span> No</span>                            @endif                        </td>
-<td>{{ $u->seguro_vencimiento?->format('d/m/Y') ?: '—' }}</td>
+<td>{{ $u->seguro_vencimiento?->format($fechaFormato) ?: '—' }}</td>
 <td>
 <div class="flex items-center gap-2">
 <a href="{{ route('unidades.show', $u) }}" class="btn btn-sm btn-ghost">Ver</a>

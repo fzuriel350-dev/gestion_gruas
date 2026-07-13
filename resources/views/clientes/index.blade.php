@@ -40,7 +40,7 @@
 <td>{{ $c->contacto ?? '—' }}</td>
 <td class="max-w-[160px] truncate">{{ $c->direccion ?? '—' }}</td>
 <td>{{ $c->servicios_count }}</td>
-<td>{{ $c->ultimo_servicio ? $c->ultimo_servicio->format('d/m/Y') : '—' }}</td>
+<td>{{ $c->ultimo_servicio ? $c->ultimo_servicio->format($fechaFormato) : '—' }}</td>
 <td>
 <div class="flex items-center gap-2">
 <a href="{{ route('clientes.edit', $c) }}" class="btn btn-sm btn-primary">Editar</a>

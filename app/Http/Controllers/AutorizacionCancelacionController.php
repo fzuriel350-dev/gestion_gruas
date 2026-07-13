@@ -36,6 +36,7 @@ class AutorizacionCancelacionController extends Controller
             'tipo_incidencia' => 'required|in:' . implode(',', AutorizacionCancelacion::TIPOS_INCIDENCIA),
         ]);
         $data['usuario_solicitante_id'] = auth()->id();
+        $data['empresa_id'] = session('empresa_id');
         $data['fecha_solicitud'] = now();
         $data['estatus'] = 'pendiente';
         AutorizacionCancelacion::create($data);
@@ -66,7 +67,12 @@ class AutorizacionCancelacionController extends Controller
         $autorizacionCancelacion->update($data);
 
         if ($data['estatus'] === 'cancelado_por_cotizador') {
-            $autorizacionCancelacion->servicio->update(['estado' => 'cancelado']);
+            $servicio = $autorizacionCancelacion->servicio;
+            $servicio->update(['estado' => 'cancelado']);
+
+            if ($servicio->operador_id) {
+                \App\Models\Operador::where('id', $servicio->operador_id)->update(['disponible' => true]);
+            }
         }
 
         return redirect()->route('autorizaciones-cancelacion.index')->with('success', 'Solicitud actualizada.');

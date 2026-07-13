@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cotizacion;
+use App\Models\Empresa;
 use App\Models\Convenio;
 use App\Models\Cliente;
 use App\Models\Aseguradora;
@@ -162,14 +163,18 @@ class CotizacionController extends Controller
             ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_COTIZADOR])
             ->get();
 
+        $notificacionesEnabled = Empresa::find(session('empresa_id'))?->notificaciones_habilitadas ?? true;
+
         foreach ($usuarios as $u) {
-            Notificacion::create([
-                'empresa_id' => session('empresa_id'),
-                'usuario_id' => $u->id,
-                'mensaje' => "Nueva cotización {$cotizacion->folio} creada. Revisión pendiente.",
-                'tipo' => 'cotizacion_creada',
-                'estado' => 'no_leida',
-            ]);
+            if ($notificacionesEnabled) {
+                Notificacion::create([
+                    'empresa_id' => session('empresa_id'),
+                    'usuario_id' => $u->id,
+                    'mensaje' => "Nueva cotización {$cotizacion->folio} creada. Revisión pendiente.",
+                    'tipo' => 'cotizacion_creada',
+                    'estado' => 'no_leida',
+                ]);
+            }
             Cache::forget("notificaciones_no_leidas_{$u->id}");
         }
 

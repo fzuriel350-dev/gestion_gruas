@@ -30,8 +30,8 @@
 {{ str_replace('_', ' ', ucfirst($a->estatus)) }}
 </span>
 </td>
-<td>{{ $a->fecha_solicitud?->format('d/m/Y H:i') }}</td>
-<td>{{ $a->fecha_resolucion?->format('d/m/Y H:i') ?: '—' }}</td>
+<td>{{ $a->fecha_solicitud?->format($fechaHoraFormato) }}</td>
+<td>{{ $a->fecha_resolucion?->format($fechaHoraFormato) ?: '—' }}</td>
 <td>
 <div class="flex items-center gap-2">
 <a href="{{ route('autorizaciones-cancelacion.show', $a) }}" class="btn btn-sm btn-ghost">Ver</a>

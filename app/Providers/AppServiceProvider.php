@@ -30,7 +30,20 @@ class AppServiceProvider extends ServiceProvider
             if ($empresaId = session('empresa_id')) {
                 $empresa = Cache::remember("empresa_{$empresaId}", 600, fn() => Empresa::find($empresaId));
             }
-            $view->with('empresa', $empresa);
+
+            $fechaFormato = $empresa->formato_fecha ?? 'd/m/Y';
+            $fechaHoraFormato = $fechaFormato . ' H:i';
+            $moneda = $empresa->moneda ?? '$';
+
+            if ($empresa && $empresa->zona_horaria) {
+                config(['app.timezone' => $empresa->zona_horaria]);
+                date_default_timezone_set($empresa->zona_horaria);
+            }
+            if ($empresa && $empresa->idioma) {
+                Carbon::setLocale($empresa->idioma);
+            }
+
+            $view->with(compact('empresa', 'fechaFormato', 'fechaHoraFormato', 'moneda'));
         });
 
         View::composer('layouts.app', function ($view) {

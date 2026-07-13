@@ -65,7 +65,7 @@
                                 {{ $cotizacion->marca ?? '—' }} {{ $cotizacion->modelo ?? '' }}
                             </td>
                             <td class="font-semibold text-sm">
-                                ${{ number_format($cotizacion->costo_total, 2) }}
+                                {{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cotizacion->costo_total, 2) : '••••' }}
                             </td>
                             <td>
                                 @php
@@ -79,7 +79,7 @@
                                     {{ ucfirst($cotizacion->estatus) }}
                                 </span>
                             </td>
-                            <td class="text-gray-500 text-sm">{{ $cotizacion->created_at->format('d/m/Y') }}</td>
+                            <td class="text-gray-500 text-sm">{{ $cotizacion->created_at->format($fechaFormato) }}</td>
                             <td>
                                 <div class="flex items-center gap-1 justify-end">
                                     <a href="{{ route('cotizaciones.show', $cotizacion) }}" class="btn-icon" title="Ver detalle">

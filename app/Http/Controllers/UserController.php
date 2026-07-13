@@ -127,6 +127,10 @@ class UserController extends Controller
             abort(403, 'No puedes eliminar tu propia cuenta.');
         }
 
+        if (!$usuario->wasCreatedBy(auth()->id())) {
+            abort(403, 'Solo puedes eliminar usuarios que tú creaste.');
+        }
+
         $empleado = $usuario->empleado;
 
         $usuario->delete();

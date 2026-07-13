@@ -20,9 +20,9 @@
 <td><strong>{{ $f->folio_factura }}</strong></td>
 <td>{{ $f->cliente?->nombre ?? '—' }}</td>
 <td>#{{ $f->servicio?->id }}</td>
-<td>${{ number_format($f->subtotal, 2) }}</td>
-<td>${{ number_format($f->iva, 2) }}</td>
-<td><strong>${{ number_format($f->total, 2) }}</strong></td>
+<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($f->subtotal, 2) : '••••' }}</td>
+<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($f->iva, 2) : '••••' }}</td>
+<td><strong>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($f->total, 2) : '••••' }}</strong></td>
 <td>
 <span class="px-2.5 py-1 rounded-full text-xs font-semibold
 @if($f->estatus === 'vigente') bg-emerald-100 text-emerald-800

@@ -55,8 +55,8 @@
 </td>
 <td class="max-w-[140px] truncate">{{ $cot->origen }}</td>
 <td class="max-w-[140px] truncate">{{ $cot->destino }}</td>
-<td>${{ number_format($cot->costo_total, 2) }}</td>
-<td>{{ $cot->created_at->format('d/m/Y') }}</td>
+<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cot->costo_total, 2) : '••••' }}</td>
+<td>{{ $cot->created_at->format($fechaFormato) }}</td>
 <td>
 <span class="status @switch($cot->estatus)                                @case('borrador') status-pending @break                                @case('pendiente') status-pending @break                                @case('aprobado') status-success @break                                @case('rechazado') status-danger @break                            @endswitch">
 <span class="status-dot">
@@ -115,16 +115,16 @@
 </div>
 <div>
 <span class="text-gray-500">Creado</span>
-<p class="font-semibold mt-0.5">{{ $cliente->created_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $cliente->created_at->format($fechaHoraFormato) }}</p>
 </div>
 <div>
 <span class="text-gray-500">Actualizado</span>
-<p class="font-semibold mt-0.5">{{ $cliente->updated_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $cliente->updated_at->format($fechaHoraFormato) }}</p>
 </div>
 @if ($cliente->trashed())
 <div>
 <span class="text-gray-500">Eliminado</span>
-<p class="font-semibold mt-0.5 text-red-600">{{ $cliente->deleted_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5 text-red-600">{{ $cliente->deleted_at->format($fechaHoraFormato) }}</p>
 </div>
 @endif
 </div>

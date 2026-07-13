@@ -25,11 +25,11 @@
 </div>
 <div>
 <p class="text-xs text-gray-500 uppercase font-semibold">Costo Banderazo</p>
-<p class="font-medium">${{ number_format($convenio->costo_banderazo, 2) }}</p>
+<p class="font-medium">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($convenio->costo_banderazo, 2) : '••••' }}</p>
 </div>
 <div>
 <p class="text-xs text-gray-500 uppercase font-semibold">Costo por km</p>
-<p class="font-medium">${{ number_format($convenio->costo_km, 2) }}</p>
+<p class="font-medium">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($convenio->costo_km, 2) : '••••' }}</p>
 </div>
 <div>
 <p class="text-xs text-gray-500 uppercase font-semibold">Km incluidos</p>
@@ -49,11 +49,11 @@
 </div>
 <div>
 <p class="text-xs text-gray-500 uppercase font-semibold">Creado</p>
-<p class="font-medium">{{ $convenio->created_at->format('d/m/Y H:i') }}</p>
+<p class="font-medium">{{ $convenio->created_at->format($fechaHoraFormato) }}</p>
 </div>
 <div>
 <p class="text-xs text-gray-500 uppercase font-semibold">Actualizado</p>
-<p class="font-medium">{{ $convenio->updated_at->format('d/m/Y H:i') }}</p>
+<p class="font-medium">{{ $convenio->updated_at->format($fechaHoraFormato) }}</p>
 </div>
 </div>
 </div>

@@ -48,8 +48,8 @@
 <td>{{ $cot->aseguradora?->nombre }}</td>
 <td>{{ $cot->tipoServicio?->nombre }}</td>
 <td>{{ number_format($cot->distancia_km, 1) }} km</td>
-<td>${{ number_format($cot->costo_total, 2) }}</td>
-<td>{{ $cot->created_at->format('d/m/Y') }}</td>
+<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($cot->costo_total, 2) : '••••' }}</td>
+<td>{{ $cot->created_at->format($fechaFormato) }}</td>
 <td>
 <span class="status @switch($cot->estatus)                                @case('pendiente') status-pending @break                                @case('aprobado') status-success @break                                @case('rechazado') status-danger @break                            @endswitch">
 <span class="status-dot">

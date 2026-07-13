@@ -59,7 +59,7 @@
 </div>
 <div>
 <span class="text-gray-500">Vencimiento de seguro</span>
-<p class="font-semibold mt-0.5">{{ $unidad->seguro_vencimiento?->format('d/m/Y') ?: '—' }}</p>
+<p class="font-semibold mt-0.5">{{ $unidad->seguro_vencimiento?->format($fechaFormato) ?: '—' }}</p>
 </div>
 <div>
 <span class="text-gray-500">Operador asignado</span>
@@ -67,16 +67,16 @@
 </div>
 <div>
 <span class="text-gray-500">Creado</span>
-<p class="font-semibold mt-0.5">{{ $unidad->created_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $unidad->created_at->format($fechaHoraFormato) }}</p>
 </div>
 <div>
 <span class="text-gray-500">Actualizado</span>
-<p class="font-semibold mt-0.5">{{ $unidad->updated_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $unidad->updated_at->format($fechaHoraFormato) }}</p>
 </div>
 @if ($unidad->trashed())
 <div>
 <span class="text-gray-500">Eliminado</span>
-<p class="font-semibold mt-0.5 text-red-600">{{ $unidad->deleted_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5 text-red-600">{{ $unidad->deleted_at->format($fechaHoraFormato) }}</p>
 </div>
 @endif
 </div>

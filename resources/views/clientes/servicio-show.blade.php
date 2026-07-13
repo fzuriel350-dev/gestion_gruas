@@ -87,7 +87,7 @@
                 </div>
                 <div class="flex justify-between">
                     <span class="text-gray-500 text-sm">Fecha de creación</span>
-                    <span class="text-sm">{{ $servicio->created_at->format('d/m/Y H:i') }}</span>
+                    <span class="text-sm">{{ $servicio->created_at->format($fechaHoraFormato) }}</span>
                 </div>
             </div>
         </div>

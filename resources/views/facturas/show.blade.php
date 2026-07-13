@@ -38,19 +38,19 @@
 </div>
 <div>
 <span class="text-gray-500">Subtotal</span>
-<p class="font-semibold mt-0.5">${{ number_format($factura->subtotal, 2) }}</p>
+<p class="font-semibold mt-0.5">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->subtotal, 2) : '••••' }}</p>
 </div>
 <div>
 <span class="text-gray-500">IVA</span>
-<p class="font-semibold mt-0.5">${{ number_format($factura->iva, 2) }}</p>
+<p class="font-semibold mt-0.5">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->iva, 2) : '••••' }}</p>
 </div>
 <div>
 <span class="text-gray-500">Total</span>
-<p class="font-semibold mt-0.5 text-lg">${{ number_format($factura->total, 2) }}</p>
+<p class="font-semibold mt-0.5 text-lg">{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->total, 2) : '••••' }}</p>
 </div>
 <div>
 <span class="text-gray-500">Fecha de emisión</span>
-<p class="font-semibold mt-0.5">{{ $factura->created_at->format('d/m/Y H:i') }}</p>
+<p class="font-semibold mt-0.5">{{ $factura->created_at->format($fechaHoraFormato) }}</p>
 </div>
 </div>
 <div class="mt-5 flex items-center gap-3 pt-4 border-t border-gray-100">

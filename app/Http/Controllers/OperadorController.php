@@ -89,7 +89,7 @@ class OperadorController extends Controller
 
     public function destroy(Operador $operador)
     {
-        $this->authorize('empleado');
+        $this->authorize('admin');
         $operador->delete();
         return redirect()->route('operadores.index')->with('success', 'Operador eliminado.');
     }

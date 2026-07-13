@@ -17,6 +17,14 @@
                 </div>
             </div>
 
+            @if ($user->isAdmin())
+            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                <div class="max-w-xl">
+                    @include('profile.partials.delete-user-form')
+                </div>
+            </div>
+            @endif
+
             @if ($user->empleado && $user->isOperador())
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
@@ -61,11 +69,11 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Vencimiento de licencia</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $user->empleado->operador->licencia_año_vencimiento?->format('d/m/Y') ?: '—' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">{{ $user->empleado->operador->licencia_año_vencimiento?->format($fechaFormato) ?: '—' }}</p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Vencimiento federal</label>
-                                    <p class="mt-1 text-sm text-gray-900">{{ $user->empleado->operador->licencia_vencimiento_federal?->format('d/m/Y') ?: '—' }}</p>
+                                    <p class="mt-1 text-sm text-gray-900">{{ $user->empleado->operador->licencia_vencimiento_federal?->format($fechaFormato) ?: '—' }}</p>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Disponible</label>

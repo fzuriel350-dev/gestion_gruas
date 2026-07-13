@@ -28,11 +28,11 @@
 </div>
                 <div>
                     <span class="text-gray-500">Registrado</span>
-                    <p class="font-semibold mt-0.5">{{ $tiposServicio->created_at->format('d/m/Y') }}</p>
+                    <p class="font-semibold mt-0.5">{{ $tiposServicio->created_at->format($fechaFormato) }}</p>
                 </div>
                 <div>
                     <span class="text-gray-500">Actualizado</span>
-                    <p class="font-semibold mt-0.5">{{ $tiposServicio->updated_at->format('d/m/Y H:i') }}</p>
+                    <p class="font-semibold mt-0.5">{{ $tiposServicio->updated_at->format($fechaHoraFormato) }}</p>
                 </div>
 </div>
 </div>
