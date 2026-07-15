@@ -14,7 +14,28 @@ class AutorizacionCancelacionController extends Controller
         $autorizaciones = AutorizacionCancelacion::with('servicio.cotizacion.cliente', 'usuarioSolicitante', 'usuarioResolutor')
             ->orderByDesc('fecha_solicitud')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('autorizaciones_cancelacion._tabla', compact('autorizaciones'))->render(),
+                'paginacion' => view('autorizaciones_cancelacion._paginacion', compact('autorizaciones'))->render(),
+            ]);
+        }
+
         return view('autorizaciones_cancelacion.index', compact('autorizaciones'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $autorizaciones = AutorizacionCancelacion::with('servicio.cotizacion.cliente', 'usuarioSolicitante', 'usuarioResolutor')
+            ->orderByDesc('fecha_solicitud')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('autorizaciones_cancelacion._tabla', compact('autorizaciones'))->render(),
+            'paginacion' => view('autorizaciones_cancelacion._paginacion', compact('autorizaciones'))->render(),
+        ]);
     }
 
     public function create()

@@ -81,10 +81,88 @@ class CotizacionController extends Controller
 
         $cotizaciones = $query->paginate(15);
 
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('cotizaciones._tabla', compact('cotizaciones'))->render(),
+                'paginacion' => view('cotizaciones._paginacion', compact('cotizaciones'))->render(),
+            ]);
+        }
+
         $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->orderBy('nombre')->get();
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
 
         return view('cotizaciones.index', compact('cotizaciones', 'aseguradoras', 'tiposServicio'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $user = auth()->user();
+        $empresaId = session('empresa_id');
+
+        $query = Cotizacion::where('empresa_id', $empresaId)
+            ->with('cliente', 'aseguradora', 'tipoServicio');
+
+        if ($user->isCliente()) {
+            $query->where('usuario_creador_id', $user->id);
+        }
+
+        if ($request->aseguradora_id) {
+            $query->where('aseguradora_id', $request->aseguradora_id);
+        }
+
+        if ($request->tipo_servicio_id) {
+            $query->where('tipo_servicio_id', $request->tipo_servicio_id);
+        }
+
+        if ($request->estatus) {
+            $query->where('estatus', $request->estatus);
+        }
+
+        if ($desde = $request->desde) {
+            $query->whereDate('created_at', '>=', $desde);
+        }
+
+        if ($hasta = $request->hasta) {
+            $query->whereDate('created_at', '<=', $hasta);
+        }
+
+        if ($q = $request->q) {
+            $query->where(function ($qry) use ($q) {
+                $qry->where('folio', 'like', "%{$q}%")
+                    ->orWhere('origen_direccion', 'like', "%{$q}%")
+                    ->orWhere('destino_direccion', 'like', "%{$q}%")
+                    ->orWhereHas('cliente', fn($c) => $c->where('nombre', 'like', "%{$q}%"));
+            });
+        }
+
+        $orden = $request->orden ?? 'creacion_desc';
+        switch ($orden) {
+            case 'cliente_asc':
+                $query->orderBy(Cliente::select('nombre')->whereColumn('clientes.id', 'cotizaciones.cliente_id'));
+                break;
+            case 'cliente_desc':
+                $query->orderByDesc(Cliente::select('nombre')->whereColumn('clientes.id', 'cotizaciones.cliente_id'));
+                break;
+            case 'total_asc':
+                $query->orderBy('costo_total');
+                break;
+            case 'total_desc':
+                $query->orderByDesc('costo_total');
+                break;
+            case 'creacion_asc':
+                $query->orderBy('created_at');
+                break;
+            default:
+                $query->orderByDesc('created_at');
+                break;
+        }
+
+        $cotizaciones = $query->paginate(15);
+
+        return response()->json([
+            'filas' => view('cotizaciones._tabla', compact('cotizaciones'))->render(),
+            'paginacion' => view('cotizaciones._paginacion', compact('cotizaciones'))->render(),
+        ]);
     }
 
     public function create()

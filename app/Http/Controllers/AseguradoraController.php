@@ -14,7 +14,28 @@ class AseguradoraController extends Controller
         $aseguradoras = Aseguradora::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('aseguradoras._tabla', compact('aseguradoras'))->render(),
+                'paginacion' => view('aseguradoras._paginacion', compact('aseguradoras'))->render(),
+            ]);
+        }
+
         return view('aseguradoras.index', compact('aseguradoras'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $aseguradoras = Aseguradora::where('empresa_id', session('empresa_id'))
+            ->orderBy('nombre')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('aseguradoras._tabla', compact('aseguradoras'))->render(),
+            'paginacion' => view('aseguradoras._paginacion', compact('aseguradoras'))->render(),
+        ]);
     }
 
     public function create()

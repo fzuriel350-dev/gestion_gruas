@@ -1,50 +1,47 @@
-@extends('layouts.app')@section('title', 'Autorizaciones de Cancelación')@section('content')<div class="max-w-7xl mx-auto">    @if (session('success'))        <div class="mb-5 px-5 py-3.5 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">{{ session('success') }}</div>    @endif    <div class="card">
-<div class="card-header">
-<h3>Autorizaciones de Cancelación</h3>
-@can('empleado')<a href="{{ route('autorizaciones-cancelacion.create') }}" class="btn btn-primary">+ Nueva Solicitud</a>@endcan
+@extends('layouts.app')
+@section('title', 'Autorizaciones de Cancelación')
+@section('content')
+<div class="max-w-7xl mx-auto">
+    @if (session('success'))
+        <div class="mb-5 px-5 py-3.5 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">{{ session('success') }}</div>
+    @endif
+    <div class="card" x-data="tablaCancelaciones()" x-init="cargar(1)">
+        <div class="card-header">
+            <h3>Autorizaciones de Cancelación</h3>
+            @can('empleado')<a href="{{ route('autorizaciones-cancelacion.create') }}" class="btn btn-primary">+ Nueva Solicitud</a>@endcan
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Cliente</th>
+                        <th>Solicitante</th>
+                        <th>Tipo</th>
+                        <th>Estatus</th>
+                        <th>Solicitud</th>
+                        <th>Resolución</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody x-html="filas"></tbody>
+            </table>
+        </div>
+        <div class="px-5 py-3 border-t border-gray-100" x-html="paginacion"></div>
+        <div x-show="loading" class="absolute inset-0 bg-white/60 flex items-center justify-center z-10" style="display: none;">
+            <svg class="animate-spin h-8 w-8 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </div>
+    </div>
 </div>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Servicio</th>
-<th>Cliente</th>
-<th>Solicitante</th>
-<th>Tipo</th>
-<th>Estatus</th>
-<th>Solicitud</th>
-<th>Resolución</th>
-<th>Acciones</th>
-</tr>
-</thead>
-<tbody>                    @forelse ($autorizaciones as $a)                    <tr>
-<td>#{{ $a->servicio?->id }}</td>
-<td>{{ $a->servicio?->cotizacion?->cliente?->nombre ?? '—' }}</td>
-<td>{{ $a->usuarioSolicitante?->name ?? '—' }}</td>
-<td>{{ str_replace('_', ' ', ucfirst($a->tipo_incidencia)) }}</td>
-<td>
-<span class="px-2.5 py-1 rounded-full text-xs font-semibold
-@if($a->estatus === 'pendiente') bg-yellow-100 text-yellow-800
-@elseif($a->estatus === 'cancelado_por_cotizador') bg-red-100 text-red-800
-@else bg-gray-100 text-gray-800 @endif">
-{{ str_replace('_', ' ', ucfirst($a->estatus)) }}
-</span>
-</td>
-<td>{{ $a->fecha_solicitud?->format($fechaHoraFormato) }}</td>
-<td>{{ $a->fecha_resolucion?->format($fechaHoraFormato) ?: '—' }}</td>
-<td>
-<div class="flex items-center gap-2">
-<a href="{{ route('autorizaciones-cancelacion.show', $a) }}" class="btn btn-sm btn-ghost">Ver</a>
-@can('admin')<a href="{{ route('autorizaciones-cancelacion.edit', $a) }}" class="btn btn-sm btn-primary">Resolver</a>@endcan
-</div>
-</td>
-</tr>                    @empty                    <tr>
-<td colspan="8" class="text-center text-gray-500 py-8">No hay solicitudes registradas.</td>
-</tr>                    @endforelse                </tbody>
-</table>
-</div>
-<div class="px-5 py-3 border-t border-gray-100">
-{{ $autorizaciones->links() }}
-</div>
-</div>
-</div>@endsection
+@endsection
+
+@push('scripts')
+<script>
+function tablaCancelaciones() {
+    return { filas: '', paginacion: '', loading: false, async cargar(pagina) { this.loading = true; const res = await fetch(`{{ route('autorizaciones-cancelacion.buscar') }}?page=${pagina}`); const d = await res.json(); this.filas = d.filas; this.paginacion = d.paginacion; this.loading = false; } }
+}
+</script>
+@endpush

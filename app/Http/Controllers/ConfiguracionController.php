@@ -39,6 +39,8 @@ class ConfiguracionController extends Controller
             'footer_texto' => 'nullable|string|max:255',
             'mostrar_precios' => 'boolean',
             'notificaciones_habilitadas' => 'boolean',
+            'logo' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
+            'favicon' => 'nullable|image|mimes:ico,png|max:512',
         ]);
 
         $data['modo_oscuro'] = $request->boolean('modo_oscuro');

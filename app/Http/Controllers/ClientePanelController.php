@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class ClientePanelController extends Controller
 {
@@ -60,7 +61,49 @@ class ClientePanelController extends Controller
 
         $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'filas' => view('clientes._servicios_tabla', compact('servicios'))->render(),
+                'paginacion' => view('clientes._servicios_paginacion', compact('servicios'))->render(),
+            ]);
+        }
+
         return view('clientes.servicios', compact('servicios'));
+    }
+
+    public function buscarServicios(Request $request)
+    {
+        $empresaId = session('empresa_id');
+        $clienteId = $this->clienteId();
+
+        if (!$clienteId) {
+            return response()->json(['filas' => '', 'paginacion' => '']);
+        }
+
+        $query = Servicio::where('empresa_id', $empresaId)
+            ->whereHas('cotizacion', fn($q) => $q->where('cliente_id', $clienteId))
+            ->with('cotizacion.tipoServicio', 'operador.empleado', 'unidad', 'tipoServicio');
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->whereHas('cotizacion', fn($qq) => $qq->where('folio', 'like', "%{$q}%"));
+        }
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+        if ($request->filled('fecha_desde')) {
+            $query->whereDate('created_at', '>=', $request->fecha_desde);
+        }
+        if ($request->filled('fecha_hasta')) {
+            $query->whereDate('created_at', '<=', $request->fecha_hasta);
+        }
+
+        $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return response()->json([
+            'filas' => view('clientes._servicios_tabla', compact('servicios'))->render(),
+            'paginacion' => view('clientes._servicios_paginacion', compact('servicios'))->render(),
+        ]);
     }
 
     public function servicioShow(Servicio $servicio)
@@ -285,7 +328,43 @@ class ClientePanelController extends Controller
 
         $cotizaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'filas' => view('clientes._cotizaciones_tabla', compact('cotizaciones'))->render(),
+                'paginacion' => view('clientes._cotizaciones_paginacion', compact('cotizaciones'))->render(),
+            ]);
+        }
+
         return view('clientes.cotizaciones', compact('cotizaciones'));
+    }
+
+    public function buscarCotizaciones(Request $request)
+    {
+        $empresaId = session('empresa_id');
+        $clienteId = $this->clienteId();
+
+        $query = Cotizacion::where('empresa_id', $empresaId)
+            ->where('cliente_id', $clienteId)
+            ->with('aseguradora', 'tipoServicio');
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function ($qq) use ($q) {
+                $qq->where('folio', 'like', "%{$q}%")
+                    ->orWhere('origen_direccion', 'like', "%{$q}%")
+                    ->orWhere('destino_direccion', 'like', "%{$q}%");
+            });
+        }
+        if ($request->filled('estatus')) {
+            $query->where('estatus', $request->estatus);
+        }
+
+        $cotizaciones = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return response()->json([
+            'filas' => view('clientes._cotizaciones_tabla', compact('cotizaciones'))->render(),
+            'paginacion' => view('clientes._cotizaciones_paginacion', compact('cotizaciones'))->render(),
+        ]);
     }
 
     public function perfil()
@@ -299,7 +378,7 @@ class ClientePanelController extends Controller
 
         $request->validate([
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => ['nullable', 'confirmed', Password::defaults()],
         ]);
 
         $data = $request->only(['email']);

@@ -16,7 +16,29 @@ class ConvenioController extends Controller
             ->with('aseguradora', 'tipoServicio')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('convenios._tabla', compact('convenios'))->render(),
+                'paginacion' => view('convenios._paginacion', compact('convenios'))->render(),
+            ]);
+        }
+
         return view('convenios.index', compact('convenios'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $convenios = Convenio::where('empresa_id', session('empresa_id'))
+            ->with('aseguradora', 'tipoServicio')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('convenios._tabla', compact('convenios'))->render(),
+            'paginacion' => view('convenios._paginacion', compact('convenios'))->render(),
+        ]);
     }
 
     public function create()

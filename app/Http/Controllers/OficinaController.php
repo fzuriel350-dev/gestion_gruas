@@ -13,7 +13,28 @@ class OficinaController extends Controller
         $oficinas = Oficina::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('oficinas._tabla', compact('oficinas'))->render(),
+                'paginacion' => view('oficinas._paginacion', compact('oficinas'))->render(),
+            ]);
+        }
+
         return view('oficinas.index', compact('oficinas'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $oficinas = Oficina::where('empresa_id', session('empresa_id'))
+            ->orderBy('nombre')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('oficinas._tabla', compact('oficinas'))->render(),
+            'paginacion' => view('oficinas._paginacion', compact('oficinas'))->render(),
+        ]);
     }
 
     public function create()

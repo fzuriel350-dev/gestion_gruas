@@ -13,7 +13,28 @@ class TipoServicioController extends Controller
         $tipos = TipoServicio::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('tipos_servicio._tabla', compact('tipos'))->render(),
+                'paginacion' => view('tipos_servicio._paginacion', compact('tipos'))->render(),
+            ]);
+        }
+
         return view('tipos_servicio.index', compact('tipos'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $tipos = TipoServicio::where('empresa_id', session('empresa_id'))
+            ->orderBy('nombre')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('tipos_servicio._tabla', compact('tipos'))->render(),
+            'paginacion' => view('tipos_servicio._paginacion', compact('tipos'))->render(),
+        ]);
     }
 
     public function create()

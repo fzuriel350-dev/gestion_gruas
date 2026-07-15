@@ -34,7 +34,39 @@ class ClienteController extends Controller
 
         $clientes = $query->orderBy('nombre')->paginate(15);
 
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('clientes._tabla', compact('clientes'))->render(),
+                'paginacion' => view('clientes._paginacion', compact('clientes'))->render(),
+            ]);
+        }
+
         return view('clientes.index', compact('clientes'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $empresaId = session('empresa_id');
+
+        $query = Cliente::where('empresa_id', $empresaId)
+            ->with('aseguradora')
+            ->withCount('servicios');
+
+        if ($q = $request->q) {
+            $query->where(function ($qry) use ($q) {
+                $qry->where('nombre', 'like', "%{$q}%")
+                    ->orWhere('empresa', 'like', "%{$q}%")
+                    ->orWhere('contacto', 'like', "%{$q}%")
+                    ->orWhere('telefono', 'like', "%{$q}%");
+            });
+        }
+
+        $clientes = $query->orderBy('nombre')->paginate(15);
+
+        return response()->json([
+            'filas' => view('clientes._tabla', compact('clientes'))->render(),
+            'paginacion' => view('clientes._paginacion', compact('clientes'))->render(),
+        ]);
     }
 
     public function create()

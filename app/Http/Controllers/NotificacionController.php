@@ -33,7 +33,39 @@ class NotificacionController extends Controller
 
         $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
+        if ($request->ajax()) {
+            return response()->json([
+                'filas' => view('notificaciones._tabla', compact('notificaciones'))->render(),
+                'paginacion' => view('notificaciones._paginacion', compact('notificaciones'))->render(),
+            ]);
+        }
+
         return view('notificaciones.index', compact('notificaciones', 'tipos'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = Notificacion::where('empresa_id', session('empresa_id'))
+            ->where(function ($q) use ($user) {
+                $q->where('usuario_id', $user->id)->orWhereNull('usuario_id');
+            });
+
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+
+        if ($request->filled('estado')) {
+            $query->where('estado', $request->estado);
+        }
+
+        $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return response()->json([
+            'filas' => view('notificaciones._tabla', compact('notificaciones'))->render(),
+            'paginacion' => view('notificaciones._paginacion', compact('notificaciones'))->render(),
+        ]);
     }
 
     public function marcarLeida(Notificacion $notificacione)

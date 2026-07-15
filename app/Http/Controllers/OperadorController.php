@@ -15,7 +15,29 @@ class OperadorController extends Controller
             ->with('empleado', 'unidades')
             ->orderBy('id')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('operadores._tabla', compact('operadores'))->render(),
+                'paginacion' => view('operadores._paginacion', compact('operadores'))->render(),
+            ]);
+        }
+
         return view('operadores.index', compact('operadores'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $operadores = Operador::where('empresa_id', session('empresa_id'))
+            ->with('empleado', 'unidades')
+            ->orderBy('id')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('operadores._tabla', compact('operadores'))->render(),
+            'paginacion' => view('operadores._paginacion', compact('operadores'))->render(),
+        ]);
     }
 
     public function create()

@@ -16,7 +16,29 @@ class FacturaController extends Controller
             ->with('cliente', 'servicio.cotizacion')
             ->orderByDesc('id')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('facturas._tabla', compact('facturas'))->render(),
+                'paginacion' => view('facturas._paginacion', compact('facturas'))->render(),
+            ]);
+        }
+
         return view('facturas.index', compact('facturas'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $facturas = Factura::where('empresa_id', session('empresa_id'))
+            ->with('cliente', 'servicio.cotizacion')
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('facturas._tabla', compact('facturas'))->render(),
+            'paginacion' => view('facturas._paginacion', compact('facturas'))->render(),
+        ]);
     }
 
     public function show(Factura $factura)

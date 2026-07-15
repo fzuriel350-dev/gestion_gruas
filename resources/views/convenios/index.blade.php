@@ -1,49 +1,52 @@
-@extends('layouts.app')@section('title', 'Convenios')@section('content')<div class="max-w-7xl mx-auto">    @if (session('success'))        <div class="mb-5 px-5 py-3.5 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">{{ session('success') }}</div>    @endif    <div class="card">
-<div class="card-header">
-<h3>Convenios</h3>            @if (auth()->user()->isAdmin())            <a href="{{ route('convenios.create') }}" class="btn btn-primary">+ Nuevo Convenio</a>            @endif        </div>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>ID</th>
-<th>Nombre</th>
-<th>Aseguradora</th>
-<th>Tipo Servicio</th>
-<th>Alcance</th>
-<th>Banderazo</th>
-<th>Costo/km</th>
-<th>Km incl.</th>
-<th>Casetas</th>
-<th>Descuento</th>
-<th>Cobertura</th>
-<th>Creado</th>
-<th>Acciones</th>
-</tr>
-</thead>
-<tbody>                    @forelse ($convenios as $c)                    <tr>
-<td><strong>#{{ $c->id }}</strong></td>
-<td>{{ $c->nombre }}</td>
-<td>{{ $c->aseguradora?->nombre ?: '—' }}</td>
-<td>{{ $c->tipoServicio?->nombre ?: '—' }}</td>
-<td>{{ ucfirst($c->tipo) }}</td>
-<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($c->costo_banderazo, 2) : '••••' }}</td>
-<td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($c->costo_km, 2) : '••••' }}</td>
-<td>{{ $c->km_incluidos }}</td>
-<td><span class="{{ $c->cubre_casetas_peaje ? 'text-emerald-600' : 'text-red-500' }} font-semibold">{{ $c->cubre_casetas_peaje ? 'Sí' : 'No' }}</span></td>
-<td>{{ $c->descuento }}%</td>
-<td>{{ $c->cobertura }}</td>
-<td>{{ $c->created_at->format($fechaFormato) }}</td>
-<td>
-<div class="flex items-center gap-2">
-<a href="{{ route('convenios.show', $c) }}" class="btn btn-sm btn-secondary">Ver</a>                                @if (auth()->user()->isAdmin())                                <a href="{{ route('convenios.edit', $c) }}" class="btn btn-sm btn-primary">Editar</a>                                <form method="POST" action="{{ route('convenios.destroy', $c) }}" class="inline" data-confirm="¿Eliminar este convenio?">                                    @csrf @method('DELETE')                                    <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>                                </form>                                @endif                            </div>
-</td>
-</tr>                    @empty                    <tr>
-<td colspan="13" class="text-center text-gray-500 py-8">No hay convenios registrados.</td>
-</tr>                    @endforelse                </tbody>
-</table>
+@extends('layouts.app')
+@section('title', 'Convenios')
+@section('content')
+<div class="max-w-7xl mx-auto">
+    @if (session('success'))
+        <div class="mb-5 px-5 py-3.5 rounded-xl text-sm font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">{{ session('success') }}</div>
+    @endif
+    <div class="card" x-data="tablaConvenios()" x-init="cargar(1)">
+        <div class="card-header">
+            <h3>Convenios</h3>
+            @if (auth()->user()->isAdmin())<a href="{{ route('convenios.create') }}" class="btn btn-primary">+ Nuevo Convenio</a>@endif
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Aseguradora</th>
+                        <th>Tipo Servicio</th>
+                        <th>Alcance</th>
+                        <th>Banderazo</th>
+                        <th>Costo/km</th>
+                        <th>Km incl.</th>
+                        <th>Casetas</th>
+                        <th>Descuento</th>
+                        <th>Cobertura</th>
+                        <th>Creado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody x-html="filas"></tbody>
+            </table>
+        </div>
+        <div class="px-5 py-3 border-t border-gray-100" x-html="paginacion"></div>
+        <div x-show="loading" class="absolute inset-0 bg-white/60 flex items-center justify-center z-10" style="display: none;">
+            <svg class="animate-spin h-8 w-8 text-yellow-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </div>
+    </div>
 </div>
-<div class="px-5 py-3 border-t border-gray-100">
-{{ $convenios->appends(request()->query())->links() }}
-</div>
-</div>
-</div>@endsection
+@endsection
+
+@push('scripts')
+<script>
+function tablaConvenios() {
+    return { filas: '', paginacion: '', loading: false, async cargar(pagina) { this.loading = true; const res = await fetch(`{{ route('convenios.buscar') }}?page=${pagina}`); const d = await res.json(); this.filas = d.filas; this.paginacion = d.paginacion; this.loading = false; } }
+}
+</script>
+@endpush

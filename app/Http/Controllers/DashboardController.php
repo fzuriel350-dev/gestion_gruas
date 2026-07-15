@@ -91,7 +91,7 @@ class DashboardController extends Controller
         foreach ($recientes as $c) {
             $cliente = $c->cliente?->nombre ?? 'Desconocido';
             $actividades[] = [
-                'text' => "{$c->folio} <strong>" . ucfirst($c->estatus) . "</strong> — {$cliente}",
+                'text' => "{$c->folio} " . ucfirst($c->estatus) . " — {$cliente}",
                 'time' => $c->created_at->diffForHumans(),
                 'dot' => match($c->estatus) {
                     'aprobado' => 'success',

@@ -19,7 +19,29 @@ class EmpleadoController extends Controller
             ->with('usuario', 'oficina')
             ->orderBy('nombre')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('empleados._tabla', compact('empleados'))->render(),
+                'paginacion' => view('empleados._paginacion', compact('empleados'))->render(),
+            ]);
+        }
+
         return view('empleados.index', compact('empleados'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('admin');
+        $empleados = Empleado::where('empresa_id', session('empresa_id'))
+            ->with('usuario', 'oficina')
+            ->orderBy('nombre')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('empleados._tabla', compact('empleados'))->render(),
+            'paginacion' => view('empleados._paginacion', compact('empleados'))->render(),
+        ]);
     }
 
     public function create()

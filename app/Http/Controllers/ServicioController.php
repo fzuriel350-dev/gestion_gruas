@@ -47,7 +47,50 @@ class ServicioController extends Controller
         }
 
         $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('servicios._tabla', compact('servicios'))->render(),
+                'paginacion' => view('servicios._paginacion', compact('servicios'))->render(),
+            ]);
+        }
+
         return view('servicios.index', compact('servicios'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $user = auth()->user();
+        $query = Servicio::where('empresa_id', session('empresa_id'))
+            ->with('cotizacion.cliente', 'operador.empleado', 'unidad', 'tipoServicio', 'oficina');
+
+        if ($user->isCliente()) {
+            $query->whereHas('cotizacion', function ($q) use ($user) {
+                $q->where('usuario_creador_id', $user->id);
+            });
+        } elseif ($user->isOperador()) {
+            $query->where('operador_id', $user->empleado?->operador?->id);
+        }
+
+        if ($q = $request->q) {
+            $query->where(function ($qry) use ($q) {
+                $qry->whereHas('cotizacion', fn($c) => $c->where('folio', 'like', "%{$q}%")
+                    ->orWhereHas('cliente', fn($cl) => $cl->where('nombre', 'like', "%{$q}%")))
+                    ->orWhereHas('operador.empleado', fn($e) => $e->where('nombre', 'like', "%{$q}%"))
+                    ->orWhere('estado', 'like', "%{$q}%");
+            });
+        }
+
+        if ($request->estado) {
+            $query->where('estado', $request->estado);
+        }
+
+        $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        return response()->json([
+            'filas' => view('servicios._tabla', compact('servicios'))->render(),
+            'paginacion' => view('servicios._paginacion', compact('servicios'))->render(),
+        ]);
     }
 
     public function create()

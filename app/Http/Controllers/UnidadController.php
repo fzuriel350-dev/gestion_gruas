@@ -15,7 +15,29 @@ class UnidadController extends Controller
             ->with('operador.empleado', 'oficina')
             ->orderBy('marca')
             ->paginate(15);
+
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('unidades._tabla', compact('unidades'))->render(),
+                'paginacion' => view('unidades._paginacion', compact('unidades'))->render(),
+            ]);
+        }
+
         return view('unidades.index', compact('unidades'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $this->authorize('empleado');
+        $unidades = Unidad::where('empresa_id', session('empresa_id'))
+            ->with('operador.empleado', 'oficina')
+            ->orderBy('marca')
+            ->paginate(15);
+
+        return response()->json([
+            'filas' => view('unidades._tabla', compact('unidades'))->render(),
+            'paginacion' => view('unidades._paginacion', compact('unidades'))->render(),
+        ]);
     }
 
     public function create()

@@ -1,0 +1,1 @@
+{{ $aseguradoras->links() }}

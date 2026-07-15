@@ -43,10 +43,17 @@ class LoginRequest extends FormRequest
         $this->ensureIsNotRateLimited();
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->throttleKey(), 300);
+
+            $remaining = RateLimiter::remaining($this->throttleKey(), 3);
+
+            $mensaje = 'Credenciales incorrectas.';
+            if ($remaining > 0) {
+                $mensaje .= ' Te quedan ' . $remaining . ' intento(s).';
+            }
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => $mensaje,
             ]);
         }
 
@@ -60,7 +67,7 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 3)) {
             return;
         }
 
@@ -69,10 +76,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => ceil($seconds / 60),
-            ]),
+            'email' => 'Demasiados intentos. Intenta de nuevo en ' . ceil($seconds / 60) . ' minutos.',
         ]);
     }
 
@@ -81,6 +85,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('email')));
     }
 }

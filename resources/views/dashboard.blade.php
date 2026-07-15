@@ -253,7 +253,7 @@ Activo
 <div class="activity-dot activity-dot-{{ $activity['dot'] }}">
 </div>
 <div class="flex-1 min-w-0">
-<div class="text-xs text-gray-800 leading-tight">{!! $activity['text'] !!}</div>
+<div class="text-xs text-gray-800 leading-tight">{{ $activity['text'] }}</div>
 <div class="text-[11px] text-gray-500 mt-0.5">{{ $activity['time'] }}</div>
 </div>
 </div>                    @endforeach                </div>

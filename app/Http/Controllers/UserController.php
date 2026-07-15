@@ -40,7 +40,43 @@ class UserController extends Controller
 
         $usuarios = $query->paginate(15);
 
+        if (request()->ajax()) {
+            return response()->json([
+                'filas' => view('usuarios._tabla', compact('usuarios'))->render(),
+                'paginacion' => view('usuarios._paginacion', compact('usuarios'))->render(),
+                'total' => $usuarios->total(),
+            ]);
+        }
+
         return view('usuarios.index', compact('usuarios'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $empresaId = session('empresa_id');
+
+        $query = User::where('empresa_id', $empresaId)
+            ->with('empleado')
+            ->orderBy('created_at', 'desc');
+
+        if ($q = $request->q) {
+            $query->where(function ($qry) use ($q) {
+                $qry->where('name', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
+            });
+        }
+
+        if ($rol = $request->rol) {
+            $query->where('role', $rol);
+        }
+
+        $usuarios = $query->paginate(15);
+
+        return response()->json([
+            'filas' => view('usuarios._tabla', compact('usuarios'))->render(),
+            'paginacion' => view('usuarios._paginacion', compact('usuarios'))->render(),
+            'total' => $usuarios->total(),
+        ]);
     }
 
     public function edit(User $usuario)

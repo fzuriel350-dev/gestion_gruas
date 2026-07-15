@@ -33,8 +33,24 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('cotizaciones/buscar', [CotizacionController::class, 'buscar'])->name('cotizaciones.buscar')->middleware('throttle:30,1');
     Route::resource('cotizaciones', CotizacionController::class);
+    Route::get('clientes/buscar', [ClienteController::class, 'buscar'])->name('clientes.buscar')->middleware('throttle:30,1');
     Route::resource('clientes', ClienteController::class);
+
+    Route::get('servicios/buscar', [ServicioController::class, 'buscar'])->name('servicios.buscar')->middleware('throttle:30,1');
+    Route::get('notificaciones/buscar', [NotificacionController::class, 'buscar'])->name('notificaciones.buscar')->middleware('throttle:30,1');
+    Route::get('usuarios/buscar', [UserController::class, 'buscar'])->name('usuarios.buscar')->middleware('throttle:30,1');
+
+    Route::get('empleados/buscar', [EmpleadoController::class, 'buscar'])->name('empleados.buscar')->middleware('throttle:30,1');
+    Route::get('operadores/buscar', [OperadorController::class, 'buscar'])->name('operadores.buscar')->middleware('throttle:30,1');
+    Route::get('unidades/buscar', [UnidadController::class, 'buscar'])->name('unidades.buscar')->middleware('throttle:30,1');
+    Route::get('oficinas/buscar', [OficinaController::class, 'buscar'])->name('oficinas.buscar')->middleware('throttle:30,1');
+    Route::get('convenios/buscar', [ConvenioController::class, 'buscar'])->name('convenios.buscar')->middleware('throttle:30,1');
+    Route::get('aseguradoras/buscar', [AseguradoraController::class, 'buscar'])->name('aseguradoras.buscar')->middleware('throttle:30,1');
+    Route::get('facturas/buscar', [FacturaController::class, 'buscar'])->name('facturas.buscar')->middleware('throttle:30,1');
+    Route::get('autorizaciones-cancelacion/buscar', [AutorizacionCancelacionController::class, 'buscar'])->name('autorizaciones-cancelacion.buscar')->middleware('throttle:30,1');
+    Route::get('tipos-servicio/buscar', [TipoServicioController::class, 'buscar'])->name('tipos-servicio.buscar')->middleware('throttle:30,1');
 
     Route::resource('aseguradoras', AseguradoraController::class);
     Route::resource('tipos-servicio', TipoServicioController::class)->parameters(['tipos-servicio' => 'tiposServicio']);
@@ -63,6 +79,8 @@ Route::middleware('auth')->group(function () {
     Route::put('configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
         Route::prefix('panel')->name('clientes.')->group(function () {
+        Route::get('/servicios/buscar', [ClientePanelController::class, 'buscarServicios'])->name('servicios.buscar')->middleware('throttle:30,1');
+        Route::get('/cotizaciones/buscar', [ClientePanelController::class, 'buscarCotizaciones'])->name('cotizaciones.buscar')->middleware('throttle:30,1');
         Route::get('/servicios', [ClientePanelController::class, 'servicios'])->name('servicios');
         Route::get('/servicios/{servicio}', [ClientePanelController::class, 'servicioShow'])->name('servicio-show');
         Route::post('/servicios/{servicio}/cancelar', [ClientePanelController::class, 'cancelarServicio'])->name('servicios.cancelar');
