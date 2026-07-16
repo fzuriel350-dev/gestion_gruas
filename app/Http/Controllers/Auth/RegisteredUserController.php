@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Empresa;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -16,7 +17,16 @@ class RegisteredUserController extends Controller
 {
     public function create()
     {
-        return Inertia::render('Auth/Register');
+        $empresa = Empresa::first();
+
+        return Inertia::render('Auth/Register', [
+            'empresa' => $empresa ? [
+                'nombre' => $empresa->nombre,
+                'logo' => $empresa->logo ? asset('storage/' . $empresa->logo) : null,
+                'color' => $empresa->color,
+                'color_secundario' => $empresa->color_secundario,
+            ] : null,
+        ]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -24,7 +34,7 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()->mixedCase()->numbers()->symbols()->uncompromised()],
         ]);
 
         $empresaId = session('empresa_id', 1);

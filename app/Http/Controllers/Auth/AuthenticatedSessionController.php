@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Empresa;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,16 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Auth/Login');
+        $empresa = Empresa::first();
+
+        return Inertia::render('Auth/Login', [
+            'empresa' => $empresa ? [
+                'nombre' => $empresa->nombre,
+                'logo' => $empresa->logo ? asset('storage/' . $empresa->logo) : null,
+                'color' => $empresa->color,
+                'color_secundario' => $empresa->color_secundario,
+            ] : null,
+        ]);
     }
 
     /**

@@ -12,7 +12,13 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $data = [];
+        $empresa = \App\Models\Empresa::find(session('empresa_id'))
+            ?? \App\Models\Empresa::first();
+
+        $data = [
+            'empresa' => $empresa,
+            'csrf_token' => csrf_token(),
+        ];
 
         if ($request->user()) {
             $user = $request->user();
@@ -20,8 +26,6 @@ class HandleInertiaRequests extends Middleware
 
             $serviciosActivos = 0;
             $noLeidas = 0;
-
-            $empresa = \App\Models\Empresa::find($empresaId);
 
             $noLeidas = \App\Models\Notificacion::where('empresa_id', $empresaId)
                 ->where(function ($q) use ($user) {
@@ -44,13 +48,11 @@ class HandleInertiaRequests extends Middleware
                     ->count();
             }
 
-            $data = [
+            $data = array_merge($data, [
                 'user' => $user,
-                'empresa' => $empresa,
                 'serviciosActivos' => $serviciosActivos,
                 'noLeidas' => $noLeidas,
-                'csrf_token' => csrf_token(),
-            ];
+            ]);
         }
 
         return array_merge(parent::share($request), $data);

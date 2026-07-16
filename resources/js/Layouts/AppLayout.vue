@@ -5,19 +5,13 @@
 
         <aside class="fixed top-0 left-0 z-40 h-screen w-[260px] bg-gradient-to-b from-[#111] to-[#0a0a0a] text-white flex flex-col shrink-0 transition-transform duration-300 ease-in-out"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-            <div class="flex items-center gap-3.5 px-5 pt-5 pb-4">
-                <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
-                    :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || empresa?.color || '#f59e0b'})` }">
-                    <img v-if="empresa?.logo" :src="`/storage/${empresa.logo}`" :alt="empresa.nombre" class="w-full h-full object-contain p-1">
-                    <svg v-else class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-[15px] font-bold leading-tight">Grúas & Equipos</h2>
-                    <small class="text-[10px] opacity-45 tracking-wide">{{ roleLabel }}</small>
-                </div>
+            <div class="text-center px-5 pt-6 pb-5">
+                <h2 class="text-lg font-extrabold tracking-wide leading-tight"
+                    :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || '#f59e0b'})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }">
+                    Grúas & Equipos
+                </h2>
+                <div class="mt-2 mx-auto w-10 h-[2px] rounded-full" :style="{ background: `linear-gradient(90deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || '#f59e0b'})` }"></div>
+                <small class="text-[11px] text-white/40 tracking-widest uppercase font-semibold mt-2 block">{{ roleLabel }}</small>
             </div>
 
             <div class="h-[3px] shrink-0" :style="{ background: `linear-gradient(90deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || empresa?.color || '#f59e0b'})` }"></div>

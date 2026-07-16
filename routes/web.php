@@ -76,7 +76,7 @@ Route::middleware('auth')->group(function () {
     Route::post('notificaciones/leer-todas', [NotificacionController::class, 'marcarTodasLeidas'])->name('notificaciones.leer-todas');
 
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
-    Route::put('configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+    Route::post('configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
         Route::prefix('panel')->name('clientes.')->group(function () {
         Route::get('/servicios', [ClientePanelController::class, 'servicios'])->name('servicios');
