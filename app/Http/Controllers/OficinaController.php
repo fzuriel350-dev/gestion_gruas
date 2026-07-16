@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Oficina;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OficinaController extends Controller
 {
@@ -14,14 +15,7 @@ class OficinaController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('oficinas._tabla', compact('oficinas'))->render(),
-                'paginacion' => view('oficinas._paginacion', compact('oficinas'))->render(),
-            ]);
-        }
-
-        return view('oficinas.index', compact('oficinas'));
+        return Inertia::render('Oficinas/Index', ['oficinas' => $oficinas]);
     }
 
     public function buscar(Request $request)
@@ -31,16 +25,12 @@ class OficinaController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('oficinas._tabla', compact('oficinas'))->render(),
-            'paginacion' => view('oficinas._paginacion', compact('oficinas'))->render(),
-        ]);
     }
 
     public function create()
     {
         $this->authorize('admin');
-        return view('oficinas.create');
+        return Inertia::render('Oficinas/Create');
     }
 
     protected function reglasValidacion(): array
@@ -79,13 +69,13 @@ class OficinaController extends Controller
     public function show(Oficina $oficina)
     {
         $this->authorize('empleado');
-        return view('oficinas.show', compact('oficina'));
+        return Inertia::render('Oficinas/Show', ['oficina' => $oficina]);
     }
 
     public function edit(Oficina $oficina)
     {
         $this->authorize('admin');
-        return view('oficinas.edit', compact('oficina'));
+        return Inertia::render('Oficinas/Edit', ['oficina' => $oficina]);
     }
 
     public function update(Request $request, Oficina $oficina)

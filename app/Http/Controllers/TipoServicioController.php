@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\TipoServicio;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class TipoServicioController extends Controller
 {
@@ -14,14 +15,7 @@ class TipoServicioController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('tipos_servicio._tabla', compact('tipos'))->render(),
-                'paginacion' => view('tipos_servicio._paginacion', compact('tipos'))->render(),
-            ]);
-        }
-
-        return view('tipos_servicio.index', compact('tipos'));
+        return Inertia::render('TiposServicio/Index', ['tipos' => $tipos]);
     }
 
     public function buscar(Request $request)
@@ -31,16 +25,12 @@ class TipoServicioController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('tipos_servicio._tabla', compact('tipos'))->render(),
-            'paginacion' => view('tipos_servicio._paginacion', compact('tipos'))->render(),
-        ]);
     }
 
     public function create()
     {
         $this->authorize('admin');
-        return view('tipos_servicio.create');
+        return Inertia::render('TiposServicio/Create');
     }
 
     protected function reglasValidacion(): array
@@ -72,13 +62,13 @@ class TipoServicioController extends Controller
     {
         $this->authorize('empleado');
         $tiposServicio->loadCount('cotizaciones');
-        return view('tipos_servicio.show', compact('tiposServicio'));
+        return Inertia::render('TiposServicio/Show', ['tiposServicio' => $tiposServicio]);
     }
 
     public function edit(TipoServicio $tiposServicio)
     {
         $this->authorize('admin');
-        return view('tipos_servicio.edit', compact('tiposServicio'));
+        return Inertia::render('TiposServicio/Edit', ['tiposServicio' => $tiposServicio]);
     }
 
     public function update(Request $request, TipoServicio $tiposServicio)

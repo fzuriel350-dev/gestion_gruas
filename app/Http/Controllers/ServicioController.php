@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ServicioController extends Controller
 {
@@ -48,14 +49,7 @@ class ServicioController extends Controller
 
         $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('servicios._tabla', compact('servicios'))->render(),
-                'paginacion' => view('servicios._paginacion', compact('servicios'))->render(),
-            ]);
-        }
-
-        return view('servicios.index', compact('servicios'));
+        return Inertia::render('Servicios/Index', ['servicios' => $servicios]);
     }
 
     public function buscar(Request $request)
@@ -87,10 +81,6 @@ class ServicioController extends Controller
 
         $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return response()->json([
-            'filas' => view('servicios._tabla', compact('servicios'))->render(),
-            'paginacion' => view('servicios._paginacion', compact('servicios'))->render(),
-        ]);
     }
 
     public function create()
@@ -111,7 +101,7 @@ class ServicioController extends Controller
         $unidades = Unidad::where('empresa_id', session('empresa_id'))->get();
         $tiposServicio = TipoServicio::where('empresa_id', session('empresa_id'))->get();
         $oficinas = Oficina::where('empresa_id', session('empresa_id'))->get();
-        return view('servicios.create', compact('cotizaciones', 'operadores', 'unidades', 'tiposServicio', 'oficinas'));
+        return Inertia::render('Servicios/Create', ['cotizaciones' => $cotizaciones, 'operadores' => $operadores, 'unidades' => $unidades, 'tiposServicio' => $tiposServicio, 'oficinas' => $oficinas]);
     }
 
     protected function reglasStore(): array
@@ -226,12 +216,13 @@ class ServicioController extends Controller
         $servicio->load('cotizacion.cliente', 'cotizacion.aseguradora', 'operador.empleado', 'unidad', 'tipoServicio', 'oficina');
 
         $progreso = match ($servicio->estado) {
-            'asignado' => 2,
-            'inicio_servicio', 'en_sitio_origen', 'en_carga' => 3,
+            'asignado' => 0,
+            'inicio_servicio' => 1,
+            'en_sitio_origen' => 2,
+            'en_carga' => 3,
             'en_transito', 'en_sitio_destino' => 4,
             'finalizado' => 5,
-            'cancelado' => 0,
-            default => 1,
+            default => -1,
         };
 
         $operadores = Operador::where('empresa_id', session('empresa_id'))
@@ -242,7 +233,7 @@ class ServicioController extends Controller
             ->where('activo', true)
             ->get();
 
-        return view('servicios.show', compact('servicio', 'progreso', 'operadores', 'unidades'));
+        return Inertia::render('Servicios/Show', ['servicio' => $servicio, 'progreso' => $progreso, 'operadores' => $operadores, 'unidades' => $unidades]);
     }
 
     public function edit(Servicio $servicio)
@@ -257,7 +248,7 @@ class ServicioController extends Controller
         $unidades = Unidad::where('empresa_id', session('empresa_id'))->get();
         $tiposServicio = TipoServicio::where('empresa_id', session('empresa_id'))->get();
         $oficinas = Oficina::where('empresa_id', session('empresa_id'))->get();
-        return view('servicios.edit', compact('servicio', 'operadores', 'unidades', 'tiposServicio', 'oficinas'));
+        return Inertia::render('Servicios/Edit', ['servicio' => $servicio, 'operadores' => $operadores, 'unidades' => $unidades, 'tiposServicio' => $tiposServicio, 'oficinas' => $oficinas]);
     }
 
     public function update(Request $request, Servicio $servicio)
@@ -301,50 +292,37 @@ class ServicioController extends Controller
         $reglas = ['estado' => 'required|in:' . $nuevoEstado];
 
         if ($nuevoEstado === 'inicio_servicio') {
-            $reglas['kms_salida'] = 'required|integer|min:0';
+            $reglas['kms_salida'] = 'nullable|integer|min:0';
         }
         if ($nuevoEstado === 'en_sitio_origen') {
-            $reglas['kms_llegada_cliente'] = 'required|integer|min:0';
+            $reglas['kms_llegada_cliente'] = 'nullable|integer|min:0';
         }
         if ($nuevoEstado === 'en_transito') {
-            $reglas['kms_termino_servicio'] = 'required|integer|min:0';
+            $reglas['kms_termino_servicio'] = 'nullable|integer|min:0';
         }
         if ($nuevoEstado === 'finalizado') {
-            $reglas['kms_regreso_base'] = 'required|integer|min:0';
-            $reglas['kms_cobrados_reales'] = 'required|integer|min:0';
+            $reglas['kms_regreso_base'] = 'nullable|integer|min:0';
+            $reglas['kms_cobrados_reales'] = 'nullable|integer|min:0';
         }
 
-        $data = $request->validate($reglas, [
-            'kms_salida.required' => 'Registra el kilometraje de salida.',
-            'kms_llegada_cliente.required' => 'Registra el kilometraje al llegar al cliente.',
-            'kms_termino_servicio.required' => 'Registra el kilometraje al terminar el servicio.',
-            'kms_regreso_base.required' => 'Registra el kilometraje de regreso a base.',
-            'kms_cobrados_reales.required' => 'Registra los kilómetros a cobrar.',
-            'costo_final_real.required' => 'Registra el costo final del servicio.',
-        ]);
+        $data = $request->validate($reglas);
 
         $updateData = ['estado' => $nuevoEstado];
 
         if ($nuevoEstado === 'inicio_servicio') {
             if (!$servicio->fecha_inicio) $updateData['fecha_inicio'] = now();
-            $updateData['kms_salida'] = $data['kms_salida'];
+            if (!empty($data['kms_salida'])) $updateData['kms_salida'] = $data['kms_salida'];
         }
         if ($nuevoEstado === 'en_sitio_origen') {
-            $updateData['kms_llegada_cliente'] = $data['kms_llegada_cliente'];
+            if (!empty($data['kms_llegada_cliente'])) $updateData['kms_llegada_cliente'] = $data['kms_llegada_cliente'];
         }
         if ($nuevoEstado === 'en_transito') {
-            $updateData['kms_termino_servicio'] = $data['kms_termino_servicio'];
+            if (!empty($data['kms_termino_servicio'])) $updateData['kms_termino_servicio'] = $data['kms_termino_servicio'];
         }
         if ($nuevoEstado === 'finalizado') {
             $updateData['fecha_fin'] = now();
-            $updateData['kms_regreso_base'] = $data['kms_regreso_base'];
-            $updateData['kms_cobrados_reales'] = $data['kms_cobrados_reales'];
-            $cotizacion = $servicio->cotizacion;
-            $costoCalculado = $cotizacion->costo_banderazo
-                + ($data['kms_cobrados_reales'] * $cotizacion->costo_km)
-                + ($cotizacion->incluye_peajes ? $cotizacion->costo_aprox_casetas : 0)
-                + ($servicio->cargos_extras ?? 0);
-            $updateData['costo_final_real'] = $costoCalculado;
+            if (!empty($data['kms_regreso_base'])) $updateData['kms_regreso_base'] = $data['kms_regreso_base'];
+            if (!empty($data['kms_cobrados_reales'])) $updateData['kms_cobrados_reales'] = $data['kms_cobrados_reales'];
             Operador::where('id', $servicio->operador_id)->update(['disponible' => true]);
         }
 

@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class CotizacionController extends Controller
 {
@@ -81,17 +82,10 @@ class CotizacionController extends Controller
 
         $cotizaciones = $query->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('cotizaciones._tabla', compact('cotizaciones'))->render(),
-                'paginacion' => view('cotizaciones._paginacion', compact('cotizaciones'))->render(),
-            ]);
-        }
-
         $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->orderBy('nombre')->get();
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
 
-        return view('cotizaciones.index', compact('cotizaciones', 'aseguradoras', 'tiposServicio'));
+        return Inertia::render('Cotizaciones/Index', ['cotizaciones' => $cotizaciones, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio]);
     }
 
     public function buscar(Request $request)
@@ -159,10 +153,6 @@ class CotizacionController extends Controller
 
         $cotizaciones = $query->paginate(15);
 
-        return response()->json([
-            'filas' => view('cotizaciones._tabla', compact('cotizaciones'))->render(),
-            'paginacion' => view('cotizaciones._paginacion', compact('cotizaciones'))->render(),
-        ]);
     }
 
     public function create()
@@ -173,7 +163,7 @@ class CotizacionController extends Controller
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
         $convenios = Convenio::where('empresa_id', $empresaId)->get();
 
-        return view('cotizaciones.create', compact('clientes', 'aseguradoras', 'tiposServicio', 'convenios'));
+        return Inertia::render('Cotizaciones/Create', ['clientes' => $clientes, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio, 'convenios' => $convenios]);
     }
 
     protected function reglasValidacion(): array
@@ -263,7 +253,7 @@ class CotizacionController extends Controller
     public function show(Cotizacion $cotizacione)
     {
         $cotizacione->load('cliente', 'aseguradora', 'tipoServicio', 'creador', 'convenio');
-        return view('cotizaciones.show', compact('cotizacione'));
+        return Inertia::render('Cotizaciones/Show', ['cotizacione' => $cotizacione]);
     }
 
     public function edit(Cotizacion $cotizacione)
@@ -274,7 +264,7 @@ class CotizacionController extends Controller
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
         $convenios = Convenio::where('empresa_id', $empresaId)->get();
 
-        return view('cotizaciones.edit', compact('cotizacione', 'clientes', 'aseguradoras', 'tiposServicio', 'convenios'));
+        return Inertia::render('Cotizaciones/Edit', ['cotizacione' => $cotizacione, 'clientes' => $clientes, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio, 'convenios' => $convenios]);
     }
 
     public function update(Request $request, Cotizacion $cotizacione)
@@ -327,10 +317,25 @@ class CotizacionController extends Controller
 
     private function generarFolio(): string
     {
+        $pool = str_split('ABCDEFGHJKLMNPQRSTUVWXYZ23456789');
         do {
-            $folio = 'COT-' . strtoupper(Str::random(6));
-        } while (Cotizacion::where('folio', $folio)->exists());
+            shuffle($pool);
+            $code = implode('', array_slice($pool, 0, 6));
+            $folio = 'COT-' . $code;
+        } while (Cotizacion::where('folio', $folio)->exists() || $this->hasSequence($code));
 
         return $folio;
+    }
+
+    private function hasSequence(string $str): bool
+    {
+        for ($i = 0; $i < 4; $i++) {
+            $a = ord($str[$i]);
+            $b = ord($str[$i + 1]);
+            $c = ord($str[$i + 2]);
+            if ($b - $a === 1 && $c - $b === 1) return true;
+            if ($a - $b === 1 && $b - $c === 1) return true;
+        }
+        return false;
     }
 }

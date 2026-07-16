@@ -5,44 +5,47 @@ namespace App\Http\Controllers;
 use App\Models\Aseguradora;
 use App\Models\TipoServicio;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AseguradoraController extends Controller
 {
+    private function authorizeAdmin()
+    {
+        if (!auth()->user()->isAdmin()) abort(403);
+    }
+
+    private function authorizeAdminOrCotizador()
+    {
+        if (auth()->user()->isOperador()) abort(403);
+    }
+
     public function index()
     {
         $this->authorize('empleado');
+        $this->authorizeAdminOrCotizador();
         $aseguradoras = Aseguradora::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('aseguradoras._tabla', compact('aseguradoras'))->render(),
-                'paginacion' => view('aseguradoras._paginacion', compact('aseguradoras'))->render(),
-            ]);
-        }
-
-        return view('aseguradoras.index', compact('aseguradoras'));
+        return Inertia::render('Aseguradoras/Index', ['aseguradoras' => $aseguradoras]);
     }
 
     public function buscar(Request $request)
     {
         $this->authorize('empleado');
+        $this->authorizeAdminOrCotizador();
         $aseguradoras = Aseguradora::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('aseguradoras._tabla', compact('aseguradoras'))->render(),
-            'paginacion' => view('aseguradoras._paginacion', compact('aseguradoras'))->render(),
-        ]);
     }
 
     public function create()
     {
         $this->authorize('empleado');
+        $this->authorizeAdmin();
         $tiposServicio = TipoServicio::where('empresa_id', session('empresa_id'))->orderBy('nombre')->get();
-        return view('aseguradoras.create', compact('tiposServicio'));
+        return Inertia::render('Aseguradoras/Create', ['tiposServicio' => $tiposServicio]);
     }
 
     protected function reglasValidacion(): array
@@ -69,6 +72,7 @@ class AseguradoraController extends Controller
     public function store(Request $request)
     {
         $this->authorize('empleado');
+        $this->authorizeAdmin();
         $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
         $empresaId = session('empresa_id');
 
@@ -86,22 +90,25 @@ class AseguradoraController extends Controller
     public function show(Aseguradora $aseguradora)
     {
         $this->authorize('empleado');
+        $this->authorizeAdminOrCotizador();
         $aseguradora->load('tiposServicio');
         $aseguradora->loadCount('convenios', 'cotizaciones');
-        return view('aseguradoras.show', compact('aseguradora'));
+        return Inertia::render('Aseguradoras/Show', ['aseguradora' => $aseguradora]);
     }
 
     public function edit(Aseguradora $aseguradora)
     {
         $this->authorize('empleado');
+        $this->authorizeAdmin();
         $aseguradora->load('tiposServicio');
         $tiposServicio = TipoServicio::where('empresa_id', session('empresa_id'))->orderBy('nombre')->get();
-        return view('aseguradoras.edit', compact('aseguradora', 'tiposServicio'));
+        return Inertia::render('Aseguradoras/Edit', ['aseguradora' => $aseguradora, 'tiposServicio' => $tiposServicio]);
     }
 
     public function update(Request $request, Aseguradora $aseguradora)
     {
         $this->authorize('empleado');
+        $this->authorizeAdmin();
         $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
         $aseguradora->update([
             'nombre' => $data['nombre'],
@@ -114,6 +121,7 @@ class AseguradoraController extends Controller
     public function destroy(Aseguradora $aseguradora)
     {
         $this->authorize('empleado');
+        $this->authorizeAdmin();
         $aseguradora->delete();
         return redirect()->route('aseguradoras.index')->with('success', 'Aseguradora eliminada.');
     }

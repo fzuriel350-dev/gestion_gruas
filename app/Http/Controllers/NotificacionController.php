@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Notificacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
 
 class NotificacionController extends Controller
 {
@@ -33,14 +34,7 @@ class NotificacionController extends Controller
 
         $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'filas' => view('notificaciones._tabla', compact('notificaciones'))->render(),
-                'paginacion' => view('notificaciones._paginacion', compact('notificaciones'))->render(),
-            ]);
-        }
-
-        return view('notificaciones.index', compact('notificaciones', 'tipos'));
+        return Inertia::render('Notificaciones/Index', ['notificaciones' => $notificaciones, 'tipos' => $tipos]);
     }
 
     public function buscar(Request $request)
@@ -62,10 +56,6 @@ class NotificacionController extends Controller
 
         $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return response()->json([
-            'filas' => view('notificaciones._tabla', compact('notificaciones'))->render(),
-            'paginacion' => view('notificaciones._paginacion', compact('notificaciones'))->render(),
-        ]);
     }
 
     public function marcarLeida(Notificacion $notificacione)
@@ -112,7 +102,7 @@ class NotificacionController extends Controller
 
         $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('cotizadores.notificaciones', compact('notificaciones', 'tipos'));
+        return Inertia::render('Cotizadores/Notificaciones', ['notificaciones' => $notificaciones, 'tipos' => $tipos]);
     }
 
     public function cotizadorMarcarLeida(Notificacion $notificacione)
@@ -160,7 +150,7 @@ class NotificacionController extends Controller
 
         $notificaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        return view('operadores.notificaciones', compact('notificaciones', 'tipos'));
+        return Inertia::render('Operadores/Notificaciones', ['notificaciones' => $notificaciones, 'tipos' => $tipos]);
     }
 
     public function operadorMarcarLeida(Notificacion $notificacione)

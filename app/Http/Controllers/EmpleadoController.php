@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Inertia\Inertia;
 
 class EmpleadoController extends Controller
 {
@@ -20,14 +21,7 @@ class EmpleadoController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('empleados._tabla', compact('empleados'))->render(),
-                'paginacion' => view('empleados._paginacion', compact('empleados'))->render(),
-            ]);
-        }
-
-        return view('empleados.index', compact('empleados'));
+        return Inertia::render('Empleados/Index', ['empleados' => $empleados]);
     }
 
     public function buscar(Request $request)
@@ -38,10 +32,6 @@ class EmpleadoController extends Controller
             ->orderBy('nombre')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('empleados._tabla', compact('empleados'))->render(),
-            'paginacion' => view('empleados._paginacion', compact('empleados'))->render(),
-        ]);
     }
 
     public function create()
@@ -50,7 +40,7 @@ class EmpleadoController extends Controller
         $oficinas = \App\Models\Oficina::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('empleados.create', compact('oficinas'));
+        return Inertia::render('Empleados/Create', ['oficinas' => $oficinas]);
     }
 
     protected function reglasBase(): array
@@ -143,7 +133,7 @@ class EmpleadoController extends Controller
     {
         $this->authorize('admin');
         $empleado->load('usuario', 'operador', 'cotizador', 'oficina');
-        return view('empleados.show', compact('empleado'));
+        return Inertia::render('Empleados/Show', ['empleado' => $empleado]);
     }
 
     public function edit(Empleado $empleado)
@@ -153,7 +143,7 @@ class EmpleadoController extends Controller
         $oficinas = \App\Models\Oficina::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('empleados.edit', compact('empleado', 'oficinas'));
+        return Inertia::render('Empleados/Edit', ['empleado' => $empleado, 'oficinas' => $oficinas]);
     }
 
     public function update(Request $request, Empleado $empleado)

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use Inertia\Inertia;
 
 class ClientePanelController extends Controller
 {
@@ -38,7 +39,7 @@ class ClientePanelController extends Controller
 
         if (!$clienteId) {
             $servicios = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
-            return view('clientes.servicios', compact('servicios'));
+            return Inertia::render('Clientes/Servicios', ['servicios' => $servicios]);
         }
 
         $query = Servicio::where('empresa_id', $empresaId)
@@ -61,49 +62,7 @@ class ClientePanelController extends Controller
 
         $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'filas' => view('clientes._servicios_tabla', compact('servicios'))->render(),
-                'paginacion' => view('clientes._servicios_paginacion', compact('servicios'))->render(),
-            ]);
-        }
-
-        return view('clientes.servicios', compact('servicios'));
-    }
-
-    public function buscarServicios(Request $request)
-    {
-        $empresaId = session('empresa_id');
-        $clienteId = $this->clienteId();
-
-        if (!$clienteId) {
-            return response()->json(['filas' => '', 'paginacion' => '']);
-        }
-
-        $query = Servicio::where('empresa_id', $empresaId)
-            ->whereHas('cotizacion', fn($q) => $q->where('cliente_id', $clienteId))
-            ->with('cotizacion.tipoServicio', 'operador.empleado', 'unidad', 'tipoServicio');
-
-        if ($request->filled('q')) {
-            $q = $request->q;
-            $query->whereHas('cotizacion', fn($qq) => $qq->where('folio', 'like', "%{$q}%"));
-        }
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-        if ($request->filled('fecha_desde')) {
-            $query->whereDate('created_at', '>=', $request->fecha_desde);
-        }
-        if ($request->filled('fecha_hasta')) {
-            $query->whereDate('created_at', '<=', $request->fecha_hasta);
-        }
-
-        $servicios = $query->orderBy('created_at', 'desc')->paginate(15);
-
-        return response()->json([
-            'filas' => view('clientes._servicios_tabla', compact('servicios'))->render(),
-            'paginacion' => view('clientes._servicios_paginacion', compact('servicios'))->render(),
-        ]);
+        return Inertia::render('Clientes/Servicios', ['servicios' => $servicios]);
     }
 
     public function servicioShow(Servicio $servicio)
@@ -129,7 +88,7 @@ class ClientePanelController extends Controller
             default => 1,
         };
 
-        return view('clientes.servicio-show', compact('servicio', 'progreso'));
+        return Inertia::render('Clientes/ServicioShow', ['servicio' => $servicio, 'progreso' => $progreso]);
     }
 
     public function cancelarServicio(Request $request, Servicio $servicio)
@@ -189,7 +148,7 @@ class ClientePanelController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return view('clientes.notificaciones', compact('notificaciones'));
+        return Inertia::render('Clientes/Notificaciones', ['notificaciones' => $notificaciones]);
     }
 
     public function notificacionLeer(Notificacion $notificacione)
@@ -328,48 +287,30 @@ class ClientePanelController extends Controller
 
         $cotizaciones = $query->orderBy('created_at', 'desc')->paginate(15);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'filas' => view('clientes._cotizaciones_tabla', compact('cotizaciones'))->render(),
-                'paginacion' => view('clientes._cotizaciones_paginacion', compact('cotizaciones'))->render(),
-            ]);
-        }
-
-        return view('clientes.cotizaciones', compact('cotizaciones'));
-    }
-
-    public function buscarCotizaciones(Request $request)
-    {
-        $empresaId = session('empresa_id');
-        $clienteId = $this->clienteId();
-
-        $query = Cotizacion::where('empresa_id', $empresaId)
-            ->where('cliente_id', $clienteId)
-            ->with('aseguradora', 'tipoServicio');
-
-        if ($request->filled('q')) {
-            $q = $request->q;
-            $query->where(function ($qq) use ($q) {
-                $qq->where('folio', 'like', "%{$q}%")
-                    ->orWhere('origen_direccion', 'like', "%{$q}%")
-                    ->orWhere('destino_direccion', 'like', "%{$q}%");
-            });
-        }
-        if ($request->filled('estatus')) {
-            $query->where('estatus', $request->estatus);
-        }
-
-        $cotizaciones = $query->orderBy('created_at', 'desc')->paginate(15);
-
-        return response()->json([
-            'filas' => view('clientes._cotizaciones_tabla', compact('cotizaciones'))->render(),
-            'paginacion' => view('clientes._cotizaciones_paginacion', compact('cotizaciones'))->render(),
-        ]);
+        return Inertia::render('Clientes/Cotizaciones', ['cotizaciones' => $cotizaciones]);
     }
 
     public function perfil()
     {
-        return view('clientes.perfil');
+        $user = auth()->user()->load('cliente.aseguradora');
+        $cliente = $user->cliente;
+        $stats = [];
+
+        if ($cliente) {
+            $stats = [
+                'total_cotizaciones' => Cotizacion::where('cliente_id', $cliente->id)->count(),
+                'total_servicios' => Servicio::whereHas('cotizacion', fn($q) => $q->where('cliente_id', $cliente->id))->count(),
+                'servicios_activos' => Servicio::whereHas('cotizacion', fn($q) => $q->where('cliente_id', $cliente->id))
+                    ->whereIn('estado', Servicio::ESTADOS_ACTIVOS)
+                    ->count(),
+            ];
+        }
+
+        return Inertia::render('Clientes/Perfil', [
+            'user' => $user,
+            'cliente' => $cliente,
+            'stats' => $stats,
+        ]);
     }
 
     public function updatePerfil(Request $request)
@@ -377,15 +318,24 @@ class ClientePanelController extends Controller
         $user = auth()->user();
 
         $request->validate([
+            'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => ['nullable', 'confirmed', Password::defaults()],
+            'telefono' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:500',
+            'contacto' => 'nullable|string|max:255',
         ]);
 
-        $data = $request->only(['email']);
+        $user->update($request->only(['name', 'email']));
+
         if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $user->update(['password' => Hash::make($request->password)]);
         }
-        $user->update($data);
+
+        $cliente = $user->cliente;
+        if ($cliente) {
+            $cliente->update($request->only(['telefono', 'direccion', 'contacto']));
+        }
 
         return back()->with('success', 'Perfil actualizado correctamente.');
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Operador;
 use App\Models\Empleado;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class OperadorController extends Controller
 {
@@ -16,14 +17,7 @@ class OperadorController extends Controller
             ->orderBy('id')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('operadores._tabla', compact('operadores'))->render(),
-                'paginacion' => view('operadores._paginacion', compact('operadores'))->render(),
-            ]);
-        }
-
-        return view('operadores.index', compact('operadores'));
+        return Inertia::render('Operadores/Index', ['operadores' => $operadores]);
     }
 
     public function buscar(Request $request)
@@ -34,10 +28,6 @@ class OperadorController extends Controller
             ->orderBy('id')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('operadores._tabla', compact('operadores'))->render(),
-            'paginacion' => view('operadores._paginacion', compact('operadores'))->render(),
-        ]);
     }
 
     public function create()
@@ -47,7 +37,7 @@ class OperadorController extends Controller
             ->whereDoesntHave('operador')
             ->orderBy('nombre')
             ->get();
-        return view('operadores.create', compact('empleados'));
+        return Inertia::render('Operadores/Create', ['empleados' => $empleados]);
     }
 
     protected function reglasValidacion(): array
@@ -85,25 +75,36 @@ class OperadorController extends Controller
     {
         $this->authorize('empleado');
         $operador->load('empleado', 'unidades');
-        return view('operadores.show', compact('operador'));
+        return Inertia::render('Operadores/Show', ['operador' => $operador]);
     }
 
     public function edit(Operador $operador)
     {
-        $this->authorize('empleado');
+        if (!auth()->user()->isAdmin() && !auth()->user()->isCotizador()) {
+            abort(403);
+        }
         $empleados = Empleado::where('empresa_id', session('empresa_id'))
             ->where(function ($q) use ($operador) {
                 $q->whereDoesntHave('operador')->orWhere('id', $operador->empleado_id);
             })
             ->orderBy('nombre')
             ->get();
-        return view('operadores.edit', compact('operador', 'empleados'));
+        return Inertia::render('Operadores/Edit', ['operador' => $operador, 'empleados' => $empleados]);
     }
 
     public function update(Request $request, Operador $operador)
     {
-        $this->authorize('empleado');
-        $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
+        if (!auth()->user()->isAdmin() && !auth()->user()->isCotizador()) {
+            abort(403);
+        }
+        $data = $request->validate([
+            'empleado_id' => ['required', 'exists:empleados,id'],
+            'licencia_tipo' => ['sometimes', 'string', 'max:50', 'regex:/^[\p{L}\p{N}\s\-]+$/u'],
+            'licencia_año_vencimiento' => ['sometimes', 'date'],
+            'licencia_vencimiento_federal' => ['nullable', 'date'],
+            'disponible' => ['boolean'],
+            'puntos_acumulados' => ['nullable', 'integer', 'min:0'],
+        ], $this->mensajesValidacion());
         $data['disponible'] = $request->boolean('disponible');
         $operador->update($data);
         return redirect()->route('operadores.index')->with('success', 'Operador actualizado correctamente.');

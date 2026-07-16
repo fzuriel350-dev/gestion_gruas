@@ -33,7 +33,9 @@
 
 @layer base {
   :root {
-    --geg-yellow: #FFD500;
+    --geg-primary: #FFD500;
+    --geg-primary-dark: #E6A000;
+    --geg-yellow: var(--geg-primary);
     --geg-yellow-dark: #E6A000;
     --geg-yellow-light: #FFF3B0;
     --geg-black: #0F0F0F;
@@ -220,12 +222,12 @@
   }
   .btn-primary {
     @apply text-black;
-    background: var(--geg-yellow);
+    background: var(--geg-primary);
   }
   .btn-primary:hover {
-    background: var(--geg-yellow-dark);
+    background: var(--geg-primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px color-mix(in srgb, var(--geg-yellow) 35%, transparent);
+    box-shadow: 0 6px 20px color-mix(in srgb, var(--geg-primary) 35%, transparent);
   }
   .btn-sm {
     @apply px-3.5 py-1.5 text-xs;
@@ -237,6 +239,19 @@
   .btn-ghost:hover {
     background: rgba(255,255,255,0.15);
     @apply -translate-y-0.5;
+  }
+  .btn-accent {
+    color: #fff;
+    background: linear-gradient(135deg, var(--geg-primary), var(--geg-primary-dark));
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--geg-primary) 30%, transparent);
+  }
+  .btn-accent:hover {
+    background: linear-gradient(135deg, var(--geg-primary-dark), color-mix(in srgb, var(--geg-primary-dark) 80%, #000));
+    box-shadow: 0 4px 14px color-mix(in srgb, var(--geg-primary) 40%, transparent);
+    transform: translateY(-1px);
+  }
+  .btn-accent:active {
+    transform: scale(0.95);
   }
   .btn-secondary {
     @apply text-gray-700 bg-gray-100 border border-gray-200;

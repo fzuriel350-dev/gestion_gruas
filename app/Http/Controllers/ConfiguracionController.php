@@ -6,6 +6,7 @@ use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ConfiguracionController extends Controller
 {
@@ -13,7 +14,7 @@ class ConfiguracionController extends Controller
     {
         $this->authorize('admin');
         $empresa = Empresa::findOrFail(session('empresa_id'));
-        return view('configuracion.index', compact('empresa'));
+        return Inertia::render('Configuracion/Index', ['empresa' => $empresa]);
     }
 
     public function update(Request $request)

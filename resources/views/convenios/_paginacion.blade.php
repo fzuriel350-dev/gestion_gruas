@@ -1,1 +1,0 @@
-{{ $convenios->links() }}

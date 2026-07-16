@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -73,7 +73,7 @@
         <div class="header-right">
             <div class="factura-badge">Factura</div>
             <div class="factura-folio">{{ $factura->folio_factura }}</div>
-            <div class="factura-fecha">Fecha de emisión: {{ $factura->created_at->format($fechaFormato) }}</div>
+            <div class="factura-fecha">Fecha de emisi├│n: {{ $factura->created_at->format($fechaFormato) }}</div>
         </div>
     </div>
 
@@ -83,7 +83,7 @@
             <div class="info-box-title">Datos del Cliente</div>
             <div class="info-row">
                 <span class="info-label">Nombre</span>
-                <span class="info-value">{{ $factura->cliente?->nombre ?? '—' }}</span>
+                <span class="info-value">{{ $factura->cliente?->nombre ?? 'ÔÇö' }}</span>
             </div>
             @if($factura->cliente?->correo)
             <div class="info-row">
@@ -93,7 +93,7 @@
             @endif
             @if($factura->cliente?->telefono)
             <div class="info-row">
-                <span class="info-label">Teléfono</span>
+                <span class="info-label">Tel├®fono</span>
                 <span class="info-value">{{ $factura->cliente->telefono }}</span>
             </div>
             @endif
@@ -108,23 +108,23 @@
             <div class="info-box-title">Datos del Servicio</div>
             <div class="info-row">
                 <span class="info-label">Folio servicio</span>
-                <span class="info-value">#{{ $factura->servicio?->id ?? '—' }}</span>
+                <span class="info-value">#{{ $factura->servicio?->id ?? 'ÔÇö' }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Tipo de servicio</span>
-                <span class="info-value">{{ $factura->servicio?->tipoServicio?->nombre ?? '—' }}</span>
+                <span class="info-value">{{ $factura->servicio?->tipoServicio?->nombre ?? 'ÔÇö' }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Cotización</span>
-                <span class="info-value">{{ $factura->servicio?->cotizacion?->folio ?? '—' }}</span>
+                <span class="info-label">Cotizaci├│n</span>
+                <span class="info-value">{{ $factura->servicio?->cotizacion?->folio ?? 'ÔÇö' }}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Fecha del servicio</span>
-                <span class="info-value">{{ $factura->servicio?->fecha_inicio?->format($fechaFormato) ?? '—' }}</span>
+                <span class="info-value">{{ $factura->servicio?->fecha_inicio?->format($fechaFormato) ?? 'ÔÇö' }}</span>
             </div>
             @if($factura->servicio?->kms_cobrados_reales)
             <div class="info-row">
-                <span class="info-label">Kilómetros</span>
+                <span class="info-label">Kil├│metros</span>
                 <span class="info-value">{{ $factura->servicio->kms_cobrados_reales }} km</span>
             </div>
             @endif
@@ -145,16 +145,16 @@
             <tbody>
                 <tr>
                     <td>1</td>
-                    <td>Servicio de grúa — {{ $factura->servicio?->tipoServicio?->nombre ?? 'N/A' }}</td>
+                    <td>Servicio de gr├║a ÔÇö {{ $factura->servicio?->tipoServicio?->nombre ?? 'N/A' }}</td>
                     <td>{{ $factura->servicio?->cotizacion?->folio ?? '' }}</td>
-                    <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->subtotal - ($factura->servicio?->cargos_extras ?? 0), 2) : '••••' }}</td>
+                    <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->subtotal - ($factura->servicio?->cargos_extras ?? 0), 2) : 'ÔÇóÔÇóÔÇóÔÇó' }}</td>
                 </tr>
                 @if(($factura->servicio?->cargos_extras ?? 0) > 0)
                 <tr>
                     <td>2</td>
-                    <td>Cargo extra por kilómetros excedidos</td>
+                    <td>Cargo extra por kil├│metros excedidos</td>
                     <td>{{ $factura->servicio?->motivo_cargos_extras ?? '' }}</td>
-                    <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->servicio->cargos_extras, 2) : '••••' }}</td>
+                    <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->servicio->cargos_extras, 2) : 'ÔÇóÔÇóÔÇóÔÇó' }}</td>
                 </tr>
                 @endif
             </tbody>
@@ -166,11 +166,11 @@
         <table class="totals-table">
             <tr>
                 <td>Subtotal</td>
-                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->subtotal, 2) : '••••' }}</td>
+                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->subtotal, 2) : 'ÔÇóÔÇóÔÇóÔÇó' }}</td>
             </tr>
             <tr>
                 <td>IVA (16%)</td>
-                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->iva, 2) : '••••' }}</td>
+                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->iva, 2) : 'ÔÇóÔÇóÔÇóÔÇó' }}</td>
             </tr>
             <tr class="totals-separator">
                 <td></td>
@@ -178,7 +178,7 @@
             </tr>
             <tr class="totals-total">
                 <td>Total</td>
-                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->total, 2) : '••••' }}</td>
+                <td>{{ $empresa && $empresa->mostrar_precios ? $moneda . number_format($factura->total, 2) : 'ÔÇóÔÇóÔÇóÔÇó' }}</td>
             </tr>
         </table>
     </div>

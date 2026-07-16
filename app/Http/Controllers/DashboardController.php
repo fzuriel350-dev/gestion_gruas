@@ -9,6 +9,7 @@ use App\Models\Operador;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
@@ -16,6 +17,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         $empresaId = session('empresa_id');
+        $empresa = \App\Models\Empresa::find($empresaId);
 
         if ($user->isCliente()) {
             $clienteId = Cliente::where('usuario_id', $user->id)->value('id');
@@ -35,8 +37,14 @@ class DashboardController extends Controller
                     ->with('cotizacion', 'operador.empleado')->first();
             }
 
-            return view('dashboard', compact('cotizacionesPendientes', 'serviciosActivos', 'serviciosFinalizados', 'servicioActivo'))
-                ->with('role', 'cliente');
+            return Inertia::render('Dashboard/Index', [
+                'role' => 'cliente',
+                'cotizacionesPendientes' => $cotizacionesPendientes,
+                'serviciosActivos' => $serviciosActivos,
+                'serviciosFinalizados' => $serviciosFinalizados,
+                'servicioActivo' => $servicioActivo,
+                'moneda' => $empresa?->moneda ?? '$',
+            ]);
         }
 
         if ($user->isOperador()) {
@@ -51,10 +59,10 @@ class DashboardController extends Controller
                 ->whereDate('fecha_fin', today())
                 ->count();
 
-            return view('dashboard', [
+            return Inertia::render('Dashboard/Index', [
                 'role' => 'operador',
-                'servicios_asignados' => $asignadosHoy,
-                'servicios_hoy' => $completadosHoy,
+                'serviciosAsignados' => $asignadosHoy,
+                'serviciosHoy' => $completadosHoy,
             ]);
         }
 
@@ -75,8 +83,15 @@ class DashboardController extends Controller
         $dias = $this->getServiciosPorDia($empresaId);
         $nuevosClientes = $this->getNuevosClientes($empresaId);
 
-        return view('dashboard', compact('stats', 'actividades', 'servicios', 'dias', 'nuevosClientes'))
-            ->with('role', 'admin');
+        return Inertia::render('Dashboard/Index', [
+            'role' => 'admin',
+            'stats' => $stats,
+            'actividades' => $actividades,
+            'servicios' => $servicios,
+            'dias' => $dias,
+            'nuevosClientes' => $nuevosClientes,
+            'moneda' => $empresa?->moneda ?? '$',
+        ]);
     }
 
     private function getActividadesRecientes(int $empresaId): array

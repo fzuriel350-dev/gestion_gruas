@@ -6,6 +6,7 @@ use App\Models\Factura;
 use App\Models\Empresa;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Inertia\Inertia;
 
 class FacturaController extends Controller
 {
@@ -17,14 +18,7 @@ class FacturaController extends Controller
             ->orderByDesc('id')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('facturas._tabla', compact('facturas'))->render(),
-                'paginacion' => view('facturas._paginacion', compact('facturas'))->render(),
-            ]);
-        }
-
-        return view('facturas.index', compact('facturas'));
+        return Inertia::render('Facturas/Index', ['facturas' => $facturas]);
     }
 
     public function buscar(Request $request)
@@ -35,17 +29,13 @@ class FacturaController extends Controller
             ->orderByDesc('id')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('facturas._tabla', compact('facturas'))->render(),
-            'paginacion' => view('facturas._paginacion', compact('facturas'))->render(),
-        ]);
     }
 
     public function show(Factura $factura)
     {
         $this->authorize('empleado');
         $factura->load('cliente', 'servicio.tipoServicio', 'servicio.cotizacion.cliente', 'servicio.cotizacion.aseguradora', 'servicio.operador.empleado');
-        return view('facturas.show', compact('factura'));
+        return Inertia::render('Facturas/Show', ['factura' => $factura]);
     }
 
     public function descargarPdf(Factura $factura)

@@ -79,8 +79,6 @@ Route::middleware('auth')->group(function () {
     Route::put('configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
 
         Route::prefix('panel')->name('clientes.')->group(function () {
-        Route::get('/servicios/buscar', [ClientePanelController::class, 'buscarServicios'])->name('servicios.buscar')->middleware('throttle:30,1');
-        Route::get('/cotizaciones/buscar', [ClientePanelController::class, 'buscarCotizaciones'])->name('cotizaciones.buscar')->middleware('throttle:30,1');
         Route::get('/servicios', [ClientePanelController::class, 'servicios'])->name('servicios');
         Route::get('/servicios/{servicio}', [ClientePanelController::class, 'servicioShow'])->name('servicio-show');
         Route::post('/servicios/{servicio}/cancelar', [ClientePanelController::class, 'cancelarServicio'])->name('servicios.cancelar');

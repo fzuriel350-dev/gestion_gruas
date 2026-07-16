@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AutorizacionCancelacion;
 use App\Models\Servicio;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class AutorizacionCancelacionController extends Controller
 {
@@ -15,14 +16,7 @@ class AutorizacionCancelacionController extends Controller
             ->orderByDesc('fecha_solicitud')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('autorizaciones_cancelacion._tabla', compact('autorizaciones'))->render(),
-                'paginacion' => view('autorizaciones_cancelacion._paginacion', compact('autorizaciones'))->render(),
-            ]);
-        }
-
-        return view('autorizaciones_cancelacion.index', compact('autorizaciones'));
+        return Inertia::render('AutorizacionesCancelacion/Index', ['autorizaciones' => $autorizaciones]);
     }
 
     public function buscar(Request $request)
@@ -32,10 +26,6 @@ class AutorizacionCancelacionController extends Controller
             ->orderByDesc('fecha_solicitud')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('autorizaciones_cancelacion._tabla', compact('autorizaciones'))->render(),
-            'paginacion' => view('autorizaciones_cancelacion._paginacion', compact('autorizaciones'))->render(),
-        ]);
     }
 
     public function create()
@@ -45,7 +35,7 @@ class AutorizacionCancelacionController extends Controller
             ->with('cotizacion.cliente')
             ->orderByDesc('id')
             ->get();
-        return view('autorizaciones_cancelacion.create', compact('servicios'));
+        return Inertia::render('AutorizacionesCancelacion/Create', ['servicios' => $servicios]);
     }
 
     public function store(Request $request)
@@ -68,13 +58,13 @@ class AutorizacionCancelacionController extends Controller
     {
         $this->authorize('empleado');
         $autorizacionCancelacion->load('servicio.cotizacion.cliente', 'servicio.operador.empleado', 'servicio.unidad', 'usuarioSolicitante', 'usuarioResolutor');
-        return view('autorizaciones_cancelacion.show', compact('autorizacionCancelacion'));
+        return Inertia::render('AutorizacionesCancelacion/Show', ['autorizacionCancelacion' => $autorizacionCancelacion]);
     }
 
     public function edit(AutorizacionCancelacion $autorizacionCancelacion)
     {
         $this->authorize('admin');
-        return view('autorizaciones_cancelacion.edit', compact('autorizacionCancelacion'));
+        return Inertia::render('AutorizacionesCancelacion/Edit', ['autorizacionCancelacion' => $autorizacionCancelacion]);
     }
 
     public function update(Request $request, AutorizacionCancelacion $autorizacionCancelacion)

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Inertia\Inertia;
 
 class UserController extends Controller
 {
@@ -40,15 +41,7 @@ class UserController extends Controller
 
         $usuarios = $query->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('usuarios._tabla', compact('usuarios'))->render(),
-                'paginacion' => view('usuarios._paginacion', compact('usuarios'))->render(),
-                'total' => $usuarios->total(),
-            ]);
-        }
-
-        return view('usuarios.index', compact('usuarios'));
+        return Inertia::render('Usuarios/Index', ['usuarios' => $usuarios]);
     }
 
     public function buscar(Request $request)
@@ -72,11 +65,6 @@ class UserController extends Controller
 
         $usuarios = $query->paginate(15);
 
-        return response()->json([
-            'filas' => view('usuarios._tabla', compact('usuarios'))->render(),
-            'paginacion' => view('usuarios._paginacion', compact('usuarios'))->render(),
-            'total' => $usuarios->total(),
-        ]);
     }
 
     public function edit(User $usuario)
@@ -93,7 +81,7 @@ class UserController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        return view('usuarios.edit', compact('usuario', 'empleados'));
+        return Inertia::render('Usuarios/Edit', ['usuario' => $usuario, 'empleados' => $empleados]);
     }
 
     public function update(Request $request, User $usuario)

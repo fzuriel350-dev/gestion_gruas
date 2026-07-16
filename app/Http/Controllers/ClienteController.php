@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ClienteController extends Controller
 {
@@ -13,6 +14,11 @@ class ClienteController extends Controller
             $this->authorize('empleado');
             return $next($request);
         });
+    }
+
+    private function authorizeAdmin()
+    {
+        if (!auth()->user()->isAdmin()) abort(403);
     }
 
     public function index()
@@ -34,14 +40,7 @@ class ClienteController extends Controller
 
         $clientes = $query->orderBy('nombre')->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('clientes._tabla', compact('clientes'))->render(),
-                'paginacion' => view('clientes._paginacion', compact('clientes'))->render(),
-            ]);
-        }
-
-        return view('clientes.index', compact('clientes'));
+        return Inertia::render('Clientes/Index', ['clientes' => $clientes]);
     }
 
     public function buscar(Request $request)
@@ -63,18 +62,15 @@ class ClienteController extends Controller
 
         $clientes = $query->orderBy('nombre')->paginate(15);
 
-        return response()->json([
-            'filas' => view('clientes._tabla', compact('clientes'))->render(),
-            'paginacion' => view('clientes._paginacion', compact('clientes'))->render(),
-        ]);
     }
 
     public function create()
     {
+        $this->authorizeAdmin();
         $aseguradoras = \App\Models\Aseguradora::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('clientes.create', compact('aseguradoras'));
+        return Inertia::render('Clientes/Create', ['aseguradoras' => $aseguradoras]);
     }
 
     protected function reglasValidacion(): array
@@ -109,6 +105,7 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
         $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
 
         $data['empresa_id'] = session('empresa_id');
@@ -120,20 +117,22 @@ class ClienteController extends Controller
 
     public function show(Cliente $cliente)
     {
-        $cliente->load('cotizaciones', 'convenios', 'aseguradora');
-        return view('clientes.show', compact('cliente'));
+        $cliente->load('cotizaciones', 'aseguradora');
+        return Inertia::render('Clientes/Show', ['cliente' => $cliente]);
     }
 
     public function edit(Cliente $cliente)
     {
+        $this->authorizeAdmin();
         $aseguradoras = \App\Models\Aseguradora::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('clientes.edit', compact('cliente', 'aseguradoras'));
+        return Inertia::render('Clientes/Edit', ['cliente' => $cliente, 'aseguradoras' => $aseguradoras]);
     }
 
     public function update(Request $request, Cliente $cliente)
     {
+        $this->authorizeAdmin();
         $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
 
         $cliente->update($data);
@@ -144,6 +143,7 @@ class ClienteController extends Controller
 
     public function destroy(Cliente $cliente)
     {
+        $this->authorizeAdmin();
         $cliente->delete();
         return redirect()->route('clientes.index')
             ->with('success', 'Cliente eliminado.');

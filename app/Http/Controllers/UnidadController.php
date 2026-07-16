@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Unidad;
 use App\Models\Operador;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class UnidadController extends Controller
 {
@@ -16,14 +17,7 @@ class UnidadController extends Controller
             ->orderBy('marca')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('unidades._tabla', compact('unidades'))->render(),
-                'paginacion' => view('unidades._paginacion', compact('unidades'))->render(),
-            ]);
-        }
-
-        return view('unidades.index', compact('unidades'));
+        return Inertia::render('Unidades/Index', ['unidades' => $unidades]);
     }
 
     public function buscar(Request $request)
@@ -34,10 +28,6 @@ class UnidadController extends Controller
             ->orderBy('marca')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('unidades._tabla', compact('unidades'))->render(),
-            'paginacion' => view('unidades._paginacion', compact('unidades'))->render(),
-        ]);
     }
 
     public function create()
@@ -50,7 +40,7 @@ class UnidadController extends Controller
         $oficinas = \App\Models\Oficina::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('unidades.create', compact('operadores', 'oficinas'));
+        return Inertia::render('Unidades/Create', ['operadores' => $operadores, 'oficinas' => $oficinas]);
     }
 
     protected function reglasValidacion(): array
@@ -98,7 +88,7 @@ class UnidadController extends Controller
     {
         $this->authorize('empleado');
         $unidad->load('operador.empleado', 'oficina');
-        return view('unidades.show', compact('unidad'));
+        return Inertia::render('Unidades/Show', ['unidad' => $unidad]);
     }
 
     public function edit(Unidad $unidad)
@@ -111,7 +101,7 @@ class UnidadController extends Controller
         $oficinas = \App\Models\Oficina::where('empresa_id', session('empresa_id'))
             ->orderBy('nombre')
             ->get();
-        return view('unidades.edit', compact('unidad', 'operadores', 'oficinas'));
+        return Inertia::render('Unidades/Edit', ['unidad' => $unidad, 'operadores' => $operadores, 'oficinas' => $oficinas]);
     }
 
     public function update(Request $request, Unidad $unidad)

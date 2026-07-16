@@ -6,6 +6,7 @@ use App\Models\Convenio;
 use App\Models\Aseguradora;
 use App\Models\TipoServicio;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ConvenioController extends Controller
 {
@@ -17,14 +18,7 @@ class ConvenioController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        if (request()->ajax()) {
-            return response()->json([
-                'filas' => view('convenios._tabla', compact('convenios'))->render(),
-                'paginacion' => view('convenios._paginacion', compact('convenios'))->render(),
-            ]);
-        }
-
-        return view('convenios.index', compact('convenios'));
+        return Inertia::render('Convenios/Index', ['convenios' => $convenios]);
     }
 
     public function buscar(Request $request)
@@ -35,10 +29,6 @@ class ConvenioController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
 
-        return response()->json([
-            'filas' => view('convenios._tabla', compact('convenios'))->render(),
-            'paginacion' => view('convenios._paginacion', compact('convenios'))->render(),
-        ]);
     }
 
     public function create()
@@ -47,7 +37,7 @@ class ConvenioController extends Controller
         $empresaId = session('empresa_id');
         $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->orderBy('nombre')->get();
         $tiposServicio = collect();
-        return view('convenios.create', compact('aseguradoras', 'tiposServicio'));
+        return Inertia::render('Convenios/Create', ['aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio]);
     }
 
     public function tiposPorAseguradora(Aseguradora $aseguradora)
@@ -101,7 +91,7 @@ class ConvenioController extends Controller
     {
         $this->authorize('empleado');
         $convenio->load('aseguradora', 'tipoServicio');
-        return view('convenios.show', compact('convenio'));
+        return Inertia::render('Convenios/Show', ['convenio' => $convenio]);
     }
 
     public function edit(Convenio $convenio)
@@ -112,7 +102,7 @@ class ConvenioController extends Controller
         $tiposServicio = $convenio->aseguradora
             ? $convenio->aseguradora->tiposServicio()->get()
             : collect();
-        return view('convenios.edit', compact('convenio', 'aseguradoras', 'tiposServicio'));
+        return Inertia::render('Convenios/Edit', ['convenio' => $convenio, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio]);
     }
 
     public function update(Request $request, Convenio $convenio)
