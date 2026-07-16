@@ -17,16 +17,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function create()
     {
-        $empresa = Empresa::first();
-
-        return Inertia::render('Auth/Login', [
-            'empresa' => $empresa ? [
-                'nombre' => $empresa->nombre,
-                'logo' => $empresa->logo ? asset('storage/' . $empresa->logo) : null,
-                'color' => $empresa->color,
-                'color_secundario' => $empresa->color_secundario,
-            ] : null,
-        ]);
+        return Inertia::render('Auth/Login');
     }
 
     /**

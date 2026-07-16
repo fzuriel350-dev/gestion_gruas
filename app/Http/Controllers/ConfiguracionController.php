@@ -43,6 +43,7 @@ class ConfiguracionController extends Controller
             'mostrar_precios' => 'boolean',
             'notificaciones_habilitadas' => 'boolean',
             'logo' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
+            'imagen_fondo' => 'nullable|image|mimes:jpeg,png,gif,webp|max:5120',
             'favicon' => 'nullable|image|mimes:ico,png|max:512',
         ]);
 
@@ -58,6 +59,11 @@ class ConfiguracionController extends Controller
             $data['logo'] = $request->file('logo')->store('empresas', 'public');
         } else {
             unset($data['logo']);
+        }
+        if ($request->hasFile('imagen_fondo')) {
+            $data['imagen_fondo'] = $request->file('imagen_fondo')->store('empresas/fondos', 'public');
+        } else {
+            unset($data['imagen_fondo']);
         }
         if ($request->hasFile('favicon')) {
             $data['favicon'] = $request->file('favicon')->store('empresas', 'public');

@@ -12,6 +12,7 @@ class Empresa extends Model
         'nombre',
         'logo',
         'logo_oscuro',
+        'imagen_fondo',
         'favicon',
         'color',
         'color_secundario',

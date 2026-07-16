@@ -21,6 +21,12 @@
                             <div v-if="form.errors.logo" class="text-red-500 text-xs mt-1">{{ form.errors.logo }}</div>
                             <img v-if="empresa.logo && !form.logo" :src="`/storage/${empresa.logo}`" class="mt-2 h-16 rounded-lg" />
                         </div>
+                        <div class="sm:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagen de fondo (página de inicio / login)</label>
+                            <input type="file" @input="form.imagen_fondo = $event.target.files[0]" class="input w-full" :class="{ 'input-error': form.errors.imagen_fondo }" />
+                            <div v-if="form.errors.imagen_fondo" class="text-red-500 text-xs mt-1">{{ form.errors.imagen_fondo }}</div>
+                            <img v-if="empresa.imagen_fondo && !form.imagen_fondo" :src="`/storage/${empresa.imagen_fondo}`" class="mt-2 h-32 w-full object-cover rounded-lg" />
+                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color primario</label>
                             <input v-model="form.color" type="color" class="input w-full h-10 p-1" />
@@ -31,33 +37,11 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Tipografía</label>
-                            <select v-model="form.tipografia" class="input w-full" :class="{ 'input-error': form.errors.tipografia }">
-                                <option value="Inter">Inter</option>
-                                <option value="Roboto">Roboto</option>
-                                <option value="Poppins">Poppins</option>
-                                <option value="Montserrat">Montserrat</option>
-                                <option value="Open Sans">Open Sans</option>
-                                <option value="Lato">Lato</option>
-                                <option value="Oswald">Oswald</option>
-                                <option value="Raleway">Raleway</option>
-                                <option value="PT Sans">PT Sans</option>
-                                <option value="Source Sans 3">Source Sans 3</option>
-                                <option value="Nunito">Nunito</option>
-                                <option value="Work Sans">Work Sans</option>
-                                <option value="Quicksand">Quicksand</option>
-                                <option value="Rubik">Rubik</option>
-                                <option value="Nunito Sans">Nunito Sans</option>
-                                <option value="DM Sans">DM Sans</option>
-                                <option value="Figtree">Figtree</option>
-                                <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
-                                <option value="Manrope">Manrope</option>
-                                <option value="Outfit">Outfit</option>
-                                <option value="Space Grotesk">Space Grotesk</option>
-                                <option value="Urbanist">Urbanist</option>
-                                <option value="Red Hat Display">Red Hat Display</option>
-                                <option value="Sarabun">Sarabun</option>
+                            <select v-model="form.tipografia" class="input w-full" :style="{ fontFamily: form.tipografia }" :class="{ 'input-error': form.errors.tipografia }">
+                                <option v-for="font in fonts" :key="font" :value="font" :style="{ fontFamily: font }">{{ font }}</option>
                             </select>
                             <div v-if="form.errors.tipografia" class="text-red-500 text-xs mt-1">{{ form.errors.tipografia }}</div>
+                            <p class="text-xs text-gray-500 mt-1">Vista previa: <span :style="{ fontFamily: form.tipografia }">ABCD abc123 — Grúas & Equipos</span></p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Moneda</label>
@@ -101,6 +85,14 @@ const props = defineProps({
     empresa: { type: Object, required: true },
 });
 
+const fonts = [
+    'Inter', 'Roboto', 'Poppins', 'Montserrat', 'Open Sans', 'Lato',
+    'Oswald', 'Raleway', 'PT Sans', 'Source Sans 3', 'Nunito', 'Work Sans',
+    'Quicksand', 'Rubik', 'Nunito Sans', 'DM Sans', 'Figtree',
+    'Plus Jakarta Sans', 'Manrope', 'Outfit', 'Space Grotesk', 'Urbanist',
+    'Red Hat Display', 'Sarabun',
+];
+
 const form = useForm({
     nombre: props.empresa.nombre || '',
     color: props.empresa.color || '#f59e0b',
@@ -111,6 +103,7 @@ const form = useForm({
     email_contacto: props.empresa.email_contacto || '',
     direccion: props.empresa.direccion || '',
     logo: null,
+    imagen_fondo: null,
 });
 
 function update() {

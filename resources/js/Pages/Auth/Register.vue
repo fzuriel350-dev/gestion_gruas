@@ -1,11 +1,11 @@
 <template>
     <div class="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
-        <div v-if="empresa && empresa.logo"
+        <div v-if="empresa && empresa.imagen_fondo"
             class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            :style="{ backgroundImage: `url(${empresa.logo})` }">
+            :style="{ backgroundImage: `url(/storage/${empresa.imagen_fondo})` }">
         </div>
-        <div v-if="empresa && empresa.logo" class="absolute inset-0 bg-black/60"></div>
-        <div v-if="!empresa || !empresa.logo" class="absolute inset-0" style="background: linear-gradient(135deg, #000000, #1a1a1a, #0F0F0F);"></div>
+        <div v-if="empresa && empresa.imagen_fondo" class="absolute inset-0 bg-black/60"></div>
+        <div v-if="!empresa || !empresa.imagen_fondo" class="absolute inset-0" style="background: linear-gradient(135deg, #000000, #1a1a1a, #0F0F0F);"></div>
         <div class="relative z-10 w-full max-w-md bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8" style="animation: fadeInUp 0.8s ease-out both;">
             <div class="text-center mb-8">
                 <h1 class="text-2xl font-extrabold text-white">Crear cuenta</h1>

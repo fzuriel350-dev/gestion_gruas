@@ -1,6 +1,13 @@
 <template>
     <AppLayout title="Mi Perfil">
         <div class="max-w-2xl mx-auto space-y-6">
+            <div class="flex items-center gap-3 mb-2">
+                <img v-if="$page.props.empresa?.logo" :src="`/storage/${$page.props.empresa.logo}`" class="w-10 h-10 object-contain rounded-lg">
+                <div>
+                    <h2 class="text-lg font-bold text-gray-900">{{ $page.props.empresa?.nombre || 'Grúas & Equipos' }}</h2>
+                    <p class="text-xs text-gray-500">{{ user?.role === 'admin' ? 'Administrador' : user?.role === 'cotizador' ? 'Cotizador' : user?.role === 'operador' ? 'Operador' : 'Empleado' }}</p>
+                </div>
+            </div>
             <div class="card">
                 <div class="card-header">
                     <h3>Información del perfil</h3>

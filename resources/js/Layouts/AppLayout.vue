@@ -6,10 +6,13 @@
         <aside class="fixed top-0 left-0 z-40 h-screen w-[260px] bg-gradient-to-b from-[#111] to-[#0a0a0a] text-white flex flex-col shrink-0 transition-transform duration-300 ease-in-out"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
             <div class="text-center px-5 pt-6 pb-5">
-                <h2 class="text-lg font-extrabold tracking-wide leading-tight"
-                    :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || '#f59e0b'})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }">
-                    Grúas & Equipos
-                </h2>
+                <div class="flex items-center justify-center gap-2">
+                    <img v-if="empresa?.logo" :src="`/storage/${empresa.logo}`" class="w-8 h-8 object-contain rounded-lg shrink-0">
+                    <h2 class="text-lg font-extrabold tracking-wide leading-tight"
+                        :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || '#f59e0b'})`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }">
+                        {{ empresa?.nombre || 'Grúas & Equipos' }}
+                    </h2>
+                </div>
                 <div class="mt-2 mx-auto w-10 h-[2px] rounded-full" :style="{ background: `linear-gradient(90deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || '#f59e0b'})` }"></div>
                 <small class="text-[11px] text-white/40 tracking-widest uppercase font-semibold mt-2 block">{{ roleLabel }}</small>
             </div>

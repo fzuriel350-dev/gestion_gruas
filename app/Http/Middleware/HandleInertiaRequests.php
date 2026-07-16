@@ -15,8 +15,18 @@ class HandleInertiaRequests extends Middleware
         $empresa = \App\Models\Empresa::find(session('empresa_id'))
             ?? \App\Models\Empresa::first();
 
+        $empresaArr = $empresa ? $empresa->toArray() : null;
+        if ($empresaArr) {
+            if ($empresaArr['logo']) {
+                $empresaArr['logo'] = asset('storage/'.$empresaArr['logo']);
+            }
+            if ($empresaArr['imagen_fondo']) {
+                $empresaArr['imagen_fondo'] = asset('storage/'.$empresaArr['imagen_fondo']);
+            }
+        }
+
         $data = [
-            'empresa' => $empresa,
+            'empresa' => $empresaArr,
             'csrf_token' => csrf_token(),
         ];
 
