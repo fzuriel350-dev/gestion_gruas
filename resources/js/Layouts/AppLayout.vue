@@ -47,7 +47,7 @@
                     <span>Mi Perfil</span>
                 </a>
                 <form method="POST" action="/logout" class="block">
-                    <input type="hidden" name="_token" :value="csrfToken">
+                    <input type="hidden" name="_token" :value="page.props.csrf_token">
                     <button type="submit"
                         class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium w-full text-white/40 hover:text-white/70 transition-all duration-150">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +104,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue';
-import { usePage } from '@inertiajs/vue3';
+import { usePage, Link } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 
 const props = defineProps({

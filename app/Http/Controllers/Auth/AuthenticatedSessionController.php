@@ -63,7 +63,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        // Forzar redirección limpia a la pantalla de login al salir
-        return redirect('/login');
+        // Forzar redirección limpia a la página principal al salir
+        return redirect('/');
     }
 }
