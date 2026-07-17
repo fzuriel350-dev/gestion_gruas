@@ -38,6 +38,41 @@
         .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: {{ $c }}; transition: width 0.3s ease; }
         .nav-link.active-nav { color: {{ $c }}; }
         .nav-link.active-nav::after { width: 100%; }
+        .clay-card {
+            background: rgba(60,50,40,0.6);
+            border-radius: 20px;
+            box-shadow: 8px 8px 16px rgba(0,0,0,0.3), -8px -8px 16px rgba(80,70,60,0.15);
+            transition: all 0.3s ease;
+        }
+        .clay-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 12px 12px 24px rgba(0,0,0,0.35), -12px -12px 24px rgba(80,70,60,0.2);
+        }
+        .clay-btn {
+            border-radius: 16px;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.3), -4px -4px 8px rgba(80,70,60,0.15);
+            transition: all 0.25s ease;
+        }
+        .clay-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 6px 6px 12px rgba(0,0,0,0.35), -6px -6px 12px rgba(80,70,60,0.2);
+        }
+        .clay-btn:active {
+            transform: scale(0.97);
+            box-shadow: inset 2px 2px 6px rgba(0,0,0,0.3), inset -2px -2px 6px rgba(80,70,60,0.15);
+        }
+        .clay-input {
+            border-radius: 16px;
+            border: none;
+            background: rgba(40,35,30,0.8);
+            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.3), inset -3px -3px 8px rgba(80,70,60,0.15);
+            transition: all 0.2s ease;
+        }
+        .clay-input:focus {
+            outline: none;
+            background: rgba(50,45,40,0.9);
+            box-shadow: inset 3px 3px 8px rgba(0,0,0,0.3), inset -3px -3px 8px rgba(80,70,60,0.15), 0 0 0 3px {{ $c }}33;
+        }
     </style>
     <script>
         let revealObserver;
@@ -85,7 +120,7 @@
                         @else
                             <a href="{{ route('login') }}" class="inline-flex items-center px-5 py-2 text-white/80 hover:text-white text-sm font-medium transition-colors duration-200">Iniciar Sesión</a>
                             @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="inline-flex items-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200" style="background:{{ $c }}; color:black;">Registrarse</a>
+                                <a href="{{ route('register') }}" class="inline-flex items-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 clay-btn" style="background:{{ $c }}; color:black;">Registrarse</a>
                             @endif
                         @endauth
                     @endif
@@ -99,12 +134,12 @@
                 <p class="text-lg text-gray-400 mb-10 animate-fade-in-up delay-200">Sistema Integral de Gestión de Gruas y Asistencia Víal</p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up delay-400">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="inline-flex items-center px-8 py-3 text-black rounded-xl font-bold text-base transition-all duration-200 hover:scale-105" style="background:{{ $c }};">
+                        <a href="{{ url('/dashboard') }}" class="inline-flex items-center px-8 py-3 text-black rounded-xl font-bold text-base transition-all duration-200 hover:scale-105 clay-btn" style="background:{{ $c }};">
                             Ir al Dashboard
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="inline-flex items-center px-8 py-3 text-black rounded-xl font-bold text-base transition-all duration-200 hover:scale-105" style="background:{{ $c }};">
+                        <a href="{{ route('login') }}" class="inline-flex items-center px-8 py-3 text-black rounded-xl font-bold text-base transition-all duration-200 hover:scale-105 clay-btn" style="background:{{ $c }};">
                             Comenzar
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                         </a>
@@ -120,14 +155,14 @@
                     <p class="text-xl lg:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto">Somos una empresa dedicada a brindar servicios de grúas y asistencia vial, comprometida con la seguridad y satisfacción de nuestros clientes.</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 reveal">
+                    <div class="clay-card p-8 transition-all duration-300 reveal">
                         <div class="w-14 h-14 flex items-center justify-center rounded-xl mb-5" style="background:{{ $c }}33;">
                             <svg class="w-7 h-7" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
                         <h3 class="text-xl font-bold mb-3" style="color:{{ $c }};">MISIÓN</h3>
                         <p class="text-gray-400 leading-relaxed">Brindar servicios de grúas y asistencia vial con rapidez, seguridad y profesionalismo, superando las expectativas de nuestros clientes y garantizando su tranquilidad en cada servicio.</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 reveal">
+                    <div class="clay-card p-8 transition-all duration-300 reveal">
                         <div class="w-14 h-14 flex items-center justify-center rounded-xl mb-5" style="background:{{ $c }}33;">
                             <svg class="w-7 h-7" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
@@ -137,22 +172,22 @@
                 </div>
                 <div class="max-w-4xl mx-auto mb-16 text-center reveal">
                     <h3 class="text-2xl font-bold mb-6" style="color:{{ $c }};">NUESTRA PRIORIDAD</h3>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 transition-all duration-300 text-left">
+                    <div class="clay-card p-8 transition-all duration-300 text-left">
                         <p class="text-gray-300 leading-relaxed text-lg">Atender cada servicio en el momento justo, con profesionalismo, eficacia y calidad, dando cuidado extremo durante el traslado, Guarda y custodia, para así lograr la satisfacción total de nuestros clientes. Proporcionando la mejor orientación y atención al usuario para la recuperación de su unidad.</p>
                     </div>
                 </div>
                 <div class="text-center mb-10">
                     <h3 class="text-2xl font-bold mb-8 reveal" style="color:{{ $c }};">NUESTROS VALORES</h3>
                     <div class="grid grid-cols-1 gap-6">
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-left transition-all duration-300 reveal">
+                        <div class="clay-card p-6 text-left transition-all duration-300 reveal">
                             <h4 class="font-bold text-lg mb-2" style="color:{{ $c }};">RESPONSABILIDAD</h4>
                             <p class="text-gray-400 leading-relaxed">Trabajando de la mano con las diferentes autoridades de manera adecuada, para así lograr la entera satisfacción de los usuarios y de la misma empresa.</p>
                         </div>
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-left transition-all duration-300 reveal">
+                        <div class="clay-card p-6 text-left transition-all duration-300 reveal">
                             <h4 class="font-bold text-lg mb-2" style="color:{{ $c }};">CONFIANZA</h4>
                             <p class="text-gray-400 leading-relaxed">Dar la tranquilidad a los ciudadanía a través de la tecnología de nuestros equipos y la capacitación de nuestro personal.</p>
                         </div>
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-left transition-all duration-300 reveal">
+                        <div class="clay-card p-6 text-left transition-all duration-300 reveal">
                             <h4 class="font-bold text-lg mb-2" style="color:{{ $c }};">RESPETO</h4>
                             <p class="text-gray-400 leading-relaxed">En todo momento y bajo cualquier circunstancia nuestro personal de cualquier área debe dirigirse al ciudadano de una forma adecuada brindando la atención que se merece.</p>
                         </div>
@@ -161,14 +196,14 @@
                 <div class="text-center reveal">
                     <h3 class="text-2xl font-bold mb-8" style="color:{{ $c }};">ACCESOS RÁPIDOS</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-                        <a href="#" onclick="showSection('servicio')" class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-center transition-all duration-300 group">
+                        <a href="#" onclick="showSection('servicio')" class="clay-card p-6 text-center transition-all duration-300 group">
                             <div class="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform duration-300" style="background:{{ $c }}33;">
                                 <svg class="w-6 h-6" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /></svg>
                             </div>
                             <h4 class="text-white font-bold">Servicios</h4>
                             <p class="text-gray-400 text-sm mt-1">Conoce todos nuestros servicios</p>
                         </a>
-                        <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 text-center transition-all duration-300 group">
+                        <div class="clay-card p-6 text-center transition-all duration-300 group">
                             <div class="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-xl group-hover:scale-110 transition-transform duration-300" style="background:{{ $c }}33;">
                                 <svg class="w-6 h-6" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
@@ -192,21 +227,21 @@
                 <h2 class="text-2xl lg:text-3xl font-bold mb-4 reveal" style="color:{{ $c }};">SERVICIOS</h2>
                 <p class="text-lg text-gray-400 mb-12 reveal">Ofrecemos soluciones rápidas y confiables para cualquier emergencia vial</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
+                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
                         <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
                             <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-3">Arrastre</h3>
                         <p class="text-gray-400 leading-relaxed">Servicio de arrastre de vehículos ligeros y pesados. Trasladamos tu vehículo de manera segura al destino que necesites.</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
+                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
                         <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
                             <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-3">Rescate</h3>
                         <p class="text-gray-400 leading-relaxed">Servicio de rescate vial para vehículos varados. Llegamos al lugar para sacar tu vehículo de cualquier situación.</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
+                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
                         <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
                             <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
@@ -221,20 +256,20 @@
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-2xl lg:text-3xl font-bold mb-6 reveal" style="color:{{ $c }};">CONTACTO</h2>
                 <p class="text-lg text-gray-400 mb-8 reveal">Estamos listos para atenderte</p>
-                <div class="border rounded-xl p-4 mb-8 text-center reveal max-w-md mx-auto" style="background:{{ $c }}15; border-color:{{ $c }}50;">
+                <div class="clay-card p-4 mb-8 text-center reveal max-w-md mx-auto" style="background:{{ $c }}15;">
                     <p class="text-sm font-semibold" style="color:{{ $c }};">EMERGENCIAS 24/7</p>
                     <p class="text-xl font-bold" style="color:{{ $c }};">{{ $tel }}</p>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 transition-all duration-300 reveal">
+                    <div class="clay-card p-6 transition-all duration-300 reveal">
                         <h3 class="text-white font-bold mb-2">Teléfono</h3>
                         <p class="text-gray-400">{{ $tel }}</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 transition-all duration-300 reveal">
+                    <div class="clay-card p-6 transition-all duration-300 reveal">
                         <h3 class="text-white font-bold mb-2">Email</h3>
                         <p class="text-gray-400">{{ $email }}</p>
                     </div>
-                    <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 transition-all duration-300 reveal">
+                    <div class="clay-card p-6 transition-all duration-300 reveal">
                         <h3 class="text-white font-bold mb-2">Ubicación</h3>
                         <p class="text-gray-400">{{ $direccion }}</p>
                     </div>

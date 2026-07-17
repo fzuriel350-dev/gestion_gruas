@@ -19,13 +19,13 @@
                             <label class="block text-sm font-medium text-gray-700 mb-1">Logo</label>
                             <input type="file" @input="form.logo = $event.target.files[0]" class="input w-full" :class="{ 'input-error': form.errors.logo }" />
                             <div v-if="form.errors.logo" class="text-red-500 text-xs mt-1">{{ form.errors.logo }}</div>
-                            <img v-if="empresa.logo && !form.logo" :src="`/storage/${empresa.logo}`" class="mt-2 h-16 rounded-lg" />
+                            <img v-if="$page.props.empresa?.logo && !form.logo" :src="$page.props.empresa.logo" class="mt-2 h-16 rounded-lg" />
                         </div>
                         <div class="sm:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Imagen de fondo (página de inicio / login)</label>
                             <input type="file" @input="form.imagen_fondo = $event.target.files[0]" class="input w-full" :class="{ 'input-error': form.errors.imagen_fondo }" />
                             <div v-if="form.errors.imagen_fondo" class="text-red-500 text-xs mt-1">{{ form.errors.imagen_fondo }}</div>
-                            <img v-if="empresa.imagen_fondo && !form.imagen_fondo" :src="`/storage/${empresa.imagen_fondo}`" class="mt-2 h-32 w-full object-cover rounded-lg" />
+                            <img v-if="$page.props.empresa?.imagen_fondo && !form.imagen_fondo" :src="$page.props.empresa.imagen_fondo" class="mt-2 h-32 w-full object-cover rounded-lg" />
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Color primario</label>
@@ -110,7 +110,6 @@ function update() {
     console.log('UPDATE EJECUTADO - logo:', form.logo, 'nombre:', form.nombre);
     form.post('/configuracion', {
         preserveScroll: true,
-        forceFormData: true,
         onError: (errors) => console.log('ERRORES:', errors),
         onSuccess: () => console.log('EXITO'),
     });

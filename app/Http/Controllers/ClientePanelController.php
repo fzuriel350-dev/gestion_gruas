@@ -11,6 +11,7 @@ use App\Models\Notificacion;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -324,9 +325,19 @@ class ClientePanelController extends Controller
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:500',
             'contacto' => 'nullable|string|max:255',
+            'foto_perfil' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
         ]);
 
-        $user->update($request->only(['name', 'email']));
+        $data = $request->only(['name', 'email']);
+
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $data['foto_perfil'] = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+        }
+
+        $user->update($data);
 
         if ($request->filled('password')) {
             $user->update(['password' => Hash::make($request->password)]);

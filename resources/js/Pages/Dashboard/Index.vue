@@ -1,213 +1,139 @@
 <template>
     <AppLayout title="Dashboard">
         <template v-if="role === 'operador'">
-            <div class="welcome-banner rounded-xl p-5 lg:p-7 mb-6 relative overflow-hidden">
-                <div class="absolute right-[-40px] top-[-40px] w-[180px] h-[180px] rounded-full" style="background: radial-gradient(circle, rgba(255,213,0,0.08) 0%, transparent 70%);"></div>
-                <div class="absolute left-0 bottom-0 w-full h-[3px]" style="background: linear-gradient(90deg, var(--geg-yellow), transparent);"></div>
-                <div>
-                    <h2 class="text-xl font-bold text-white mb-1">Bienvenido, <span style="color: var(--geg-yellow);">{{ user.name }}</span></h2>
-                    <p class="text-[13.5px] text-white/60">Tienes <strong class="text-white/90">{{ serviciosAsignados }} servicios asignados</strong> hoy</p>
+            <div class="card p-6 mb-6" style="background:var(--geg-card-orange);border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold" style="color:var(--geg-text);">Bienvenido, <span style="color:var(--geg-btn-orange);">{{ user.name }}</span></h2>
+                        <p style="color:var(--geg-text-secondary);font-size:14px;font-weight:500;">Tienes <strong style="color:var(--geg-text);">{{ serviciosAsignados }} servicios asignados</strong> hoy</p>
+                    </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #d1fae5; color: var(--geg-success);">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ serviciosAsignados }}</div>
-                        <div class="stat-label">Asignados hoy</div>
-                    </div>
+            <div class="metrics-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;">
+                <div class="metric-card" style="background:var(--geg-card-purple);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);" @click="$inertia.visit('/servicios')">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Asignados hoy</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ serviciosAsignados }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:var(--geg-success);background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">Activos ahora</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #fef3c7; color: var(--geg-yellow-dark);">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ serviciosHoy }}</div>
-                        <div class="stat-label">Completados hoy</div>
-                    </div>
+                <div class="metric-card" style="background:var(--geg-card-green);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Completados hoy</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ serviciosHoy }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:var(--geg-success);background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">Completado</span>
                 </div>
             </div>
         </template>
 
         <template v-else-if="role === 'cliente'">
-            <div class="welcome-banner rounded-xl p-6 lg:p-8 mb-6 relative overflow-hidden">
-                <div class="absolute right-[-40px] top-[-40px] w-[220px] h-[220px] rounded-full" style="background: radial-gradient(circle, rgba(255,213,0,0.1) 0%, transparent 70%);"></div>
-                <div class="absolute left-[60%] bottom-[-60px] w-[300px] h-[300px] rounded-full" style="background: radial-gradient(circle, rgba(255,213,0,0.05) 0%, transparent 70%);"></div>
-                <div class="absolute left-0 bottom-0 w-full h-[3px]" style="background: linear-gradient(90deg, var(--geg-yellow), transparent);"></div>
-                <div class="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white mb-1">Hola, <span style="color: var(--geg-yellow);">{{ user.name }}</span></h2>
-                        <p class="text-sm text-white/50">Bienvenido a tu panel de control</p>
-                    </div>
+            <div class="card p-6 mb-6" style="background:var(--geg-card-blue);border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                <div>
+                    <h2 class="text-xl font-bold" style="color:var(--geg-text);">Hola, <span style="color:var(--geg-btn-orange);">{{ user.name }}</span></h2>
+                    <p style="color:var(--geg-text-secondary);font-size:14px;">Bienvenido a tu panel de control</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                <div class="stat-card">
-                    <div class="stat-icon" :style="{ background: `linear-gradient(135deg, ${empresaColorLight}, color-mix(in srgb, ${empresaColor} 30%, white))`, color: empresaColorDark }">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ cotizacionesPendientes }}</div>
-                        <div class="stat-label">Cotizaciones pendientes</div>
-                    </div>
+            <div class="metrics-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+                <div class="metric-card" style="background:var(--geg-card-purple);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Cotizaciones pendientes</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ cotizacionesPendientes }}</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ serviciosActivos }}</div>
-                        <div class="stat-label">Servicios activos</div>
-                    </div>
+                <div class="metric-card" style="background:var(--geg-card-green);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Servicios activos</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ serviciosActivos }}</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #7c3aed;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ serviciosFinalizados }}</div>
-                        <div class="stat-label">Servicios finalizados</div>
-                    </div>
+                <div class="metric-card" style="background:var(--geg-card-orange);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Servicios finalizados</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ serviciosFinalizados }}</span>
                 </div>
             </div>
         </template>
 
         <template v-else>
-            <div class="welcome-banner rounded-xl p-5 lg:p-7 flex items-center justify-between gap-5 mb-6 relative overflow-hidden">
-                <div class="absolute right-[-40px] top-[-40px] w-[180px] h-[180px] rounded-full" style="background: radial-gradient(circle, rgba(255,213,0,0.08) 0%, transparent 70%);"></div>
-                <div class="absolute left-0 bottom-0 w-full h-[3px]" style="background: linear-gradient(90deg, var(--geg-yellow), transparent);"></div>
+            <div class="flex items-center justify-between gap-5 mb-6" style="background:var(--geg-card-purple);border-radius:24px;padding:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
                 <div>
-                    <h2 class="text-xl font-bold text-white mb-1">Bienvenido de nuevo, <span style="color: var(--geg-yellow);">{{ user.name }}</span></h2>
-                    <p class="text-[13.5px] text-white/60">Hoy tienes <strong class="text-white/90">{{ stats.servicios_activos }} servicios activos</strong> y <strong class="text-white/90">{{ stats.cotizaciones_pendientes }} cotizaciones pendientes</strong> por revisar.</p>
+                    <h2 style="font-size:28px;font-weight:800;color:var(--geg-text);">Analytics overview</h2>
+                    <p style="color:var(--geg-text-secondary);font-size:14px;font-weight:500;">Bienvenido de nuevo, <strong style="color:var(--geg-text);">{{ user.name }}</strong></p>
                 </div>
-                <div class="flex gap-2.5 shrink-0 flex-wrap">
-                    <a href="/cotizaciones" class="btn btn-primary">Ir a cotizaciones</a>
+                <button class="btn-export" style="background:var(--geg-btn-orange);color:white;border:none;padding:12px 24px;border-radius:18px;font-weight:bold;cursor:pointer;box-shadow:4px 6px 15px rgba(255,138,101,0.3),inset -3px -3px 6px rgba(0,0,0,0.15),inset 3px 3px 6px rgba(255,255,255,0.3);">📥 Export report</button>
+            </div>
+
+            <div class="metrics-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:24px;">
+                <div class="metric-card" style="background:var(--geg-card-purple);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Cotizaciones pendientes</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ stats.cotizaciones_pendientes }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:#10B981;background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">Pendientes</span>
+                </div>
+                <div class="metric-card" style="background:var(--geg-card-green);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Servicios activos</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ stats.servicios_activos }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:#10B981;background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">+8.1% ↑</span>
+                </div>
+                <div class="metric-card" style="background:var(--geg-card-orange);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Operadores disponibles</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ stats.operadores_disponibles }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:#EF4444;background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">{{ stats.operadores_ocupados }} ocupados ↓</span>
+                </div>
+                <div class="metric-card" style="background:var(--geg-card-blue);padding:20px;border-radius:24px;box-shadow:5px 10px 20px rgba(0,0,0,0.03),inset -4px -4px 8px rgba(0,0,0,0.05),inset 4px 4px 8px rgba(255,255,255,0.9);">
+                    <span style="font-size:14px;color:var(--geg-text-secondary);font-weight:600;">Ingresos del mes</span>
+                    <span style="font-size:32px;font-weight:800;color:var(--geg-text);">{{ formatCurrency(stats.ingresos_mes, moneda) }}</span>
+                    <span style="display:inline-block;align-self:flex-start;padding:4px 10px;border-radius:10px;font-size:12px;font-weight:bold;color:#10B981;background:rgba(255,255,255,0.6);box-shadow:inset -1px -1px 3px rgba(0,0,0,0.05),inset 1px 1px 3px #fff;">+2.8% ↑</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-                <div class="stat-card">
-                    <div class="stat-icon" :style="{ background: empresaColorLight, color: empresaColorDark }">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ stats.cotizaciones_pendientes }}</div>
-                        <div class="stat-label">Cotizaciones pendientes</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #d1fae5; color: var(--geg-success);">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ stats.servicios_activos }}</div>
-                        <div class="stat-label">Servicios activos</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #fef3c7; color: var(--geg-yellow-dark);">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ stats.operadores_disponibles }}</div>
-                        <div class="stat-label">Operadores disponibles</div>
-                        <div class="stat-trend down">{{ stats.operadores_ocupados }} ocupados</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background: #ede9fe; color: #7c3aed;">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div class="stat-info">
-                        <div class="stat-value">{{ formatCurrency(stats.ingresos_mes, moneda) }}</div>
-                        <div class="stat-label">Ingresos del mes</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5 mb-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Servicios por día</h3>
-                        <div class="flex items-center gap-2.5">
-                            <span class="text-xs font-semibold px-3 py-1 rounded-full" :style="{ background: empresaColorLight, color: empresaColorDark }">Esta semana</span>
+            <div class="middle-grid" style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px;">
+                <div style="background:var(--geg-card-purple);border-radius:24px;padding:24px;box-shadow:inset -4px -4px 10px rgba(0,0,0,0.02),inset 4px 4px 10px rgba(0,0,0,0.05);">
+                    <h3 style="font-weight:700;margin-bottom:16px;color:var(--geg-text);">Servicios por día</h3>
+                    <div class="flex items-end gap-3" style="height:180px;padding-top:16px;">
+                        <div v-for="day in dias" :key="day.label" class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                            <span style="font-size:11px;font-weight:bold;color:var(--geg-text-secondary);">{{ day.value }}</span>
+                            <div class="chart-bar" :style="{ height: day.height + '%' }"></div>
+                            <span style="font-size:11px;color:var(--geg-text-secondary);font-weight:500;">{{ day.label }}</span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="flex items-end gap-3 h-[180px] pt-4">
-                            <div v-for="day in dias" :key="day.label" class="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
-                                <span class="text-[11px] font-bold text-gray-800 order-first">{{ day.value }}</span>
-                                <div class="chart-bar" :style="{ height: day.height + '%' }"></div>
-                                <span class="text-[11px] text-gray-500 font-medium">{{ day.label }}</span>
+                </div>
+                <div style="background:var(--geg-card-green);border-radius:24px;padding:24px;box-shadow:inset -4px -4px 10px rgba(0,0,0,0.02),inset 4px 4px 10px rgba(0,0,0,0.05);">
+                    <h3 style="font-weight:700;margin-bottom:16px;color:var(--geg-text);">Actividad reciente</h3>
+                    <div class="activity-list" style="display:flex;flex-direction:column;gap:10px;">
+                        <div v-for="activity in actividades" :key="activity.text" class="flex items-center justify-between" style="background:white;padding:12px 20px;border-radius:15px;box-shadow:3px 5px 10px rgba(0,0,0,0.02),inset -2px -2px 5px rgba(0,0,0,0.05),inset 2px 2px 5px #fff;">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full" :class="`bg-${activity.dot}-600`"></div>
+                                <span style="font-size:13px;color:var(--geg-text);"><strong>{{ activity.text.split(' ')[0] }}</strong>{{ activity.text.substring(activity.text.indexOf(' ')) }}</span>
                             </div>
+                            <span style="color:var(--geg-text-secondary);font-size:13px;">{{ activity.time }}</span>
                         </div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Actividad reciente</h3>
-                    </div>
-                    <div class="card-body py-2">
-                        <div v-for="activity in actividades" :key="activity.text" class="flex items-start gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="activity-dot" :class="`activity-dot-${activity.dot}`"></div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs text-gray-800 leading-tight">{{ activity.text }}</div>
-                                <div class="text-[11px] text-gray-500 mt-0.5">{{ activity.time }}</div>
-                            </div>
-                        </div>
+                        <div v-if="actividades.length === 0" style="text-align:center;padding:20px;color:var(--geg-text-secondary);font-size:14px;">Sin actividad reciente</div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5">
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Servicios recientes</h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr>
-                                    <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Folio</th>
-                                    <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Cliente</th>
-                                    <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Origen</th>
-                                    <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Destino</th>
-                                    <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="svc in servicios" :key="svc.folio" class="hover:bg-gray-50">
-                                    <td class="px-5 py-3 text-sm border-b border-gray-50"><strong>{{ svc.folio }}</strong></td>
-                                    <td class="px-5 py-3 text-sm border-b border-gray-50">{{ svc.cliente }}</td>
-                                    <td class="px-5 py-3 text-sm border-b border-gray-50">{{ svc.origen }}</td>
-                                    <td class="px-5 py-3 text-sm border-b border-gray-50">{{ svc.destino }}</td>
-                                    <td class="px-5 py-3 text-sm border-b border-gray-50">
-                                        <span class="status" :class="`status-${svc.class}`">
-                                            <span class="status-dot"></span> {{ svc.estado }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <h3>Nuevos clientes registrados</h3>
-                    </div>
-                    <div class="card-body py-2">
-                        <div v-for="cliente in nuevosClientes" :key="cliente.name" class="flex items-start gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-50 transition-colors">
-                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold shrink-0">{{ cliente.name.substring(0, 2) }}</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-xs text-gray-800 font-medium">{{ cliente.name }}</div>
-                                <div class="text-[11px] text-gray-500">{{ cliente.email }}</div>
-                            </div>
-                            <div class="text-[11px] text-gray-400 shrink-0">{{ cliente.time }}</div>
-                        </div>
-                        <div v-if="nuevosClientes.length === 0" class="text-center py-8 text-gray-400 text-sm">Sin registros recientes</div>
-                    </div>
+            <div style="background:var(--geg-card-orange);border-radius:24px;padding:24px;box-shadow:inset -4px -4px 10px rgba(0,0,0,0.02),inset 4px 4px 10px rgba(0,0,0,0.05);">
+                <h3 style="font-weight:700;margin-bottom:15px;color:var(--geg-text);">Servicios recientes</h3>
+                <div class="overflow-x-auto">
+                    <table style="width:100%;font-size:14px;border-collapse:separate;border-spacing:0 8px;">
+                        <thead>
+                            <tr>
+                                <th style="text-align:left;padding:8px 16px;font-size:12px;font-weight:700;color:var(--geg-text-secondary);">Folio</th>
+                                <th style="text-align:left;padding:8px 16px;font-size:12px;font-weight:700;color:var(--geg-text-secondary);">Cliente</th>
+                                <th style="text-align:left;padding:8px 16px;font-size:12px;font-weight:700;color:var(--geg-text-secondary);">Origen</th>
+                                <th style="text-align:left;padding:8px 16px;font-size:12px;font-weight:700;color:var(--geg-text-secondary);">Destino</th>
+                                <th style="text-align:left;padding:8px 16px;font-size:12px;font-weight:700;color:var(--geg-text-secondary);">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="svc in servicios" :key="svc.folio" style="background:white;border-radius:15px;box-shadow:3px 5px 10px rgba(0,0,0,0.02),inset -2px -2px 5px rgba(0,0,0,0.05),inset 2px 2px 5px #fff;">
+                                <td style="padding:12px 16px;border-radius:15px 0 0 15px;font-weight:700;">{{ svc.folio }}</td>
+                                <td style="padding:12px 16px;">{{ svc.cliente }}</td>
+                                <td style="padding:12px 16px;">{{ svc.origen }}</td>
+                                <td style="padding:12px 16px;">{{ svc.destino }}</td>
+                                <td style="padding:12px 16px;border-radius:0 15px 15px 0;">
+                                    <span class="status" :class="`status-${svc.class}`">
+                                        <span class="status-dot"></span> {{ svc.estado }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr v-if="servicios.length === 0">
+                                <td colspan="5" style="text-align:center;padding:24px;color:var(--geg-text-secondary);">Sin servicios recientes</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </template>
@@ -242,6 +168,4 @@ const empresa = computed(() => page.props.empresa);
 const empresaColor = computed(() => empresa.value?.color || '#f59e0b');
 const empresaColorDark = computed(() => empresa.value?.color_secundario || empresa.value?.color || '#f59e0b');
 const empresaColorLight = computed(() => `${empresaColor.value}22`);
-
-
 </script>

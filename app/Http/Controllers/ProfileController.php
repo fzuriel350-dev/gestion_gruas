@@ -7,6 +7,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ProfileController extends Controller
@@ -28,6 +29,15 @@ class ProfileController extends Controller
             unset($data['name']);
         }
 
+        if ($request->hasFile('foto_perfil')) {
+            if ($user->foto_perfil) {
+                Storage::disk('public')->delete($user->foto_perfil);
+            }
+            $data['foto_perfil'] = $request->file('foto_perfil')->store('fotos_perfil', 'public');
+        } else {
+            unset($data['foto_perfil']);
+        }
+
         $user->fill($data);
 
         if ($user->isDirty('email')) {
@@ -36,7 +46,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.edit')->with('success', 'Perfil actualizado correctamente.');
     }
 
     public function destroy(Request $request): RedirectResponse

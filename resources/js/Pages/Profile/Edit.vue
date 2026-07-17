@@ -1,18 +1,34 @@
 <template>
     <AppLayout title="Mi Perfil">
         <div class="max-w-2xl mx-auto space-y-6">
-            <div class="flex items-center gap-3 mb-2">
-                <img v-if="$page.props.empresa?.logo" :src="`/storage/${$page.props.empresa.logo}`" class="w-10 h-10 object-contain rounded-lg">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900">{{ $page.props.empresa?.nombre || 'Grúas & Equipos' }}</h2>
-                    <p class="text-xs text-gray-500">{{ user?.role === 'admin' ? 'Administrador' : user?.role === 'cotizador' ? 'Cotizador' : user?.role === 'operador' ? 'Operador' : 'Empleado' }}</p>
-                </div>
-            </div>
             <div class="card">
-                <div class="card-header">
-                    <h3>Información del perfil</h3>
-                </div>
                 <div class="card-body">
+                    <div class="flex items-center gap-5 mb-6">
+                        <label class="relative cursor-pointer group shrink-0">
+                            <input type="file" accept="image/*" class="hidden" @change="onFotoChange">
+                            <div v-if="fotoPreview || user?.foto_perfil_url"
+                                class="w-20 h-20 rounded-2xl overflow-hidden"
+                                style="box-shadow:4px 4px 10px var(--geg-clay-shadow-dark),-4px -4px 10px var(--geg-clay-shadow-light);">
+                                <img :src="fotoPreview || user?.foto_perfil_url" class="w-full h-full object-cover">
+                            </div>
+                            <div v-else
+                                class="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold"
+                                style="background:linear-gradient(135deg, var(--geg-yellow), var(--geg-yellow-dark));color:black;box-shadow:4px 4px 10px var(--geg-clay-shadow-dark),-4px -4px 10px var(--geg-clay-shadow-light);">
+                                {{ (user?.name || '?')[0].toUpperCase() }}
+                            </div>
+                            <div class="absolute inset-0 rounded-2xl bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
+                        </label>
+                        <div>
+                            <h2 class="text-lg font-bold">{{ user?.name }}</h2>
+                            <p class="text-xs text-gray-500">Haz clic en la foto para cambiarla</p>
+                        </div>
+                    </div>
+
                     <form @submit.prevent="updateProfile">
                         <div class="space-y-4">
                             <div>
@@ -87,14 +103,27 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import { usePage, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 const user = usePage().props.auth?.user || usePage().props.user;
 
+const fotoPreview = ref(null);
+
+function onFotoChange(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    profileForm.foto_perfil = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => { fotoPreview.value = ev.target.result; };
+    reader.readAsDataURL(file);
+}
+
 const profileForm = useForm({
     name: user?.name || '',
     email: user?.email || '',
+    foto_perfil: null,
 });
 
 const passwordForm = useForm({
@@ -108,7 +137,13 @@ const deleteForm = useForm({
 });
 
 function updateProfile() {
-    profileForm.patch('/profile');
+    profileForm.patch('/profile', {
+        preserveScroll: true,
+        onSuccess: () => {
+            fotoPreview.value = null;
+            profileForm.foto_perfil = null;
+        },
+    });
 }
 
 function updatePassword() {

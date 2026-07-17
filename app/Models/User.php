@@ -23,7 +23,15 @@ class User extends Authenticatable
         'empresa_id',
         'empleado_id',
         'created_by',
+        'foto_perfil',
     ];
+
+    protected $appends = ['foto_perfil_url'];
+
+    public function getFotoPerfilUrlAttribute(): ?string
+    {
+        return $this->foto_perfil ? asset('storage/'.$this->foto_perfil) : null;
+    }
 
     protected $hidden = [
         'password',
