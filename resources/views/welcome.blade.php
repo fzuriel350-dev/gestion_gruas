@@ -226,7 +226,7 @@
             <div class="max-w-6xl mx-auto text-center">
                 <h2 class="text-2xl lg:text-3xl font-bold mb-4 reveal" style="color:{{ $c }};">SERVICIOS</h2>
                 <p class="text-lg text-gray-400 mb-12 reveal">Ofrecemos soluciones rápidas y confiables para cualquier emergencia vial</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
                         <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
                             <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -236,17 +236,24 @@
                     </div>
                     <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
                         <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
+                            <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Asistencia</h3>
+                        <p class="text-gray-400 leading-relaxed">Asistencia vial básica: paso de corriente, cambio de llanta, cerraduría, suministro de gasolina, etc.</p>
+                    </div>
+                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
+                        <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
+                            <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Plataforma</h3>
+                        <p class="text-gray-400 leading-relaxed">Servicio de plataforma para transporte de vehículos. Ideal para mudanzas, traslados y distribución.</p>
+                    </div>
+                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
+                        <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
                             <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                         </div>
                         <h3 class="text-xl font-bold text-white mb-3">Rescate</h3>
                         <p class="text-gray-400 leading-relaxed">Servicio de rescate vial para vehículos varados. Llegamos al lugar para sacar tu vehículo de cualquier situación.</p>
-                    </div>
-                    <div class="clay-card p-8 text-center transition-all duration-300 hover:-translate-y-2 reveal">
-                        <div class="w-16 h-16 mx-auto mb-5 flex items-center justify-center rounded-xl" style="background:{{ $c }}33;">
-                            <svg class="w-8 h-8" style="color:{{ $c }};" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-white mb-3">Auxilio Vial</h3>
-                        <p class="text-gray-400 leading-relaxed">Asistencia vial básica: paso de corriente, cambio de llanta, cerraduría, suministro de gasolina, etc.</p>
                     </div>
                 </div>
             </div>

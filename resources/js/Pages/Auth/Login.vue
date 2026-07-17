@@ -39,31 +39,6 @@
                         :style="form.errors.password ? 'box-shadow:inset 3px 3px 8px rgba(0,0,0,0.3),inset -3px -3px 8px rgba(80,70,60,0.15),0 0 0 3px rgba(248,113,113,0.3)' : ''"
                         @focus="$event.target.style.background='rgba(50,45,40,0.95)'"
                         @blur="$event.target.style.background='rgba(40,35,30,0.9)'">
-
-                    <div v-if="form.password.length > 0" class="mt-3 space-y-1.5">
-                        <div v-for="rule in passwordRules" :key="rule.label" class="flex items-center gap-2 text-xs">
-                            <div class="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                                :class="rule.met ? 'bg-green-500' : 'bg-white/10 border border-white/20'">
-                                <svg v-if="rule.met" class="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <span :class="rule.met ? 'text-green-400' : 'text-gray-500'">{{ rule.label }}</span>
-                        </div>
-
-                        <div class="pt-2">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-xs font-semibold" :class="strengthColor">{{ strengthLabel }}</span>
-                                <span class="text-[10px] text-gray-500">{{ strengthScore }}/4</span>
-                            </div>
-                            <div class="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-300"
-                                    :class="strengthBarColor"
-                                    :style="{ width: (strengthScore / 4 * 100) + '%' }">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <div class="flex items-center justify-between mb-6">
@@ -98,8 +73,6 @@
 
 <script setup>
 import { useForm, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
-
 defineProps({
     empresa: { type: Object, default: null },
 });
@@ -108,52 +81,6 @@ const form = useForm({
     email: '',
     password: '',
     remember: false,
-});
-
-const hasMinLength = computed(() => form.password.length >= 8);
-const hasLowercase = computed(() => /[a-z]/.test(form.password));
-const hasUppercase = computed(() => /[A-Z]/.test(form.password));
-const hasNumber = computed(() => /[0-9]/.test(form.password));
-const hasSymbol = computed(() => /[^a-zA-Z0-9]/.test(form.password));
-
-const passwordRules = computed(() => [
-    { label: 'Minimo 8 caracteres', met: hasMinLength.value },
-    { label: 'Letras minusculas', met: hasLowercase.value },
-    { label: 'Letras mayusculas', met: hasUppercase.value },
-    { label: 'Al menos 1 numero', met: hasNumber.value },
-    { label: 'Al menos 1 simbolo', met: hasSymbol.value },
-]);
-
-const strengthScore = computed(() => {
-    let score = 0;
-    if (hasMinLength.value) score++;
-    if (hasLowercase.value) score++;
-    if (hasUppercase.value) score++;
-    if (hasNumber.value) score++;
-    if (hasSymbol.value) score++;
-    if (form.password.length >= 12) score = Math.min(score + 1, 4);
-    return Math.min(score, 4);
-});
-
-const strengthLabel = computed(() => {
-    if (strengthScore.value <= 1) return 'Muy facil';
-    if (strengthScore.value === 2) return 'Facil';
-    if (strengthScore.value === 3) return 'Media';
-    return 'Segura';
-});
-
-const strengthColor = computed(() => {
-    if (strengthScore.value <= 1) return 'text-red-400';
-    if (strengthScore.value === 2) return 'text-orange-400';
-    if (strengthScore.value === 3) return 'text-yellow-400';
-    return 'text-green-400';
-});
-
-const strengthBarColor = computed(() => {
-    if (strengthScore.value <= 1) return 'bg-red-500';
-    if (strengthScore.value === 2) return 'bg-orange-500';
-    if (strengthScore.value === 3) return 'bg-yellow-500';
-    return 'bg-green-500';
 });
 
 const submit = () => {

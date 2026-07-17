@@ -165,7 +165,7 @@ const props = defineProps({
 
 const user = computed(() => page.props.user);
 const empresa = computed(() => page.props.empresa);
-const empresaColor = computed(() => empresa.value?.color || '#f59e0b');
-const empresaColorDark = computed(() => empresa.value?.color_secundario || empresa.value?.color || '#f59e0b');
+const empresaColor = computed(() => empresa.value?.color || '#FFD500');
+const empresaColorDark = computed(() => empresa.value?.color_secundario || empresa.value?.color || '#FFD500');
 const empresaColorLight = computed(() => `${empresaColor.value}22`);
 </script>

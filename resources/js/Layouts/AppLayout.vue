@@ -5,12 +5,13 @@
 
         <aside class="fixed top-0 left-0 z-40 h-screen w-[260px] flex flex-col shrink-0 transition-transform duration-300 ease-in-out"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-            style="background:var(--geg-sidebar-bg);border-radius:0 30px 30px 0;padding:30px 20px;justify-content:space-between;box-shadow:10px 10px 20px rgba(0,0,0,0.05),inset -5px -5px 10px rgba(0,0,0,0.1),inset 5px 5px 10px rgba(255,255,255,0.9);">
-            <div class="flex items-center gap-3" style="margin-bottom:40px;padding-left:10px;">
-                <div style="width:40px;height:40px;background:#A5F3FC;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--geg-text);box-shadow:inset -2px -2px 6px rgba(0,0,0,0.15),inset 2px 2px 6px #fff;">
+            :style="sidebarStyle">
+            <div class="flex items-center" style="margin-bottom:32px;padding-left:6px;gap:14px;">
+                <img v-if="empresa?.logo" :src="empresa.logo" style="width:70px;height:70px;border-radius:16px;object-fit:cover;box-shadow:inset -2px -2px 6px rgba(0,0,0,0.15),inset 2px 2px 6px #fff;" />
+                <div v-else style="width:70px;height:70px;background:#A5F3FC;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:var(--geg-text);box-shadow:inset -2px -2px 6px rgba(0,0,0,0.15),inset 2px 2px 6px #fff;">
                     {{ empresa?.nombre?.charAt(0) || 'C' }}
                 </div>
-                <span style="font-size:24px;font-weight:bold;color:var(--geg-text);">{{ empresa?.nombre || 'SIGESGA' }}</span>
+                <span style="font-size:24px;font-weight:bold;color:var(--geg-text);letter-spacing:1px;">{{ empresa?.nombre || 'SIGESGA' }}</span>
             </div>
             <nav class="menu" style="flex-grow:1;overflow-y:auto;">
                 <template v-for="section in sidebarSections" :key="section.title">
@@ -28,7 +29,7 @@
                             :href="item.href"
                             @click="closeSection(section.title)"
                             style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:16px;text-decoration:none;font-weight:500;font-size:13.5px;transition:all 0.25s ease;color:var(--geg-text);"
-                            :style="isActive(item.route) ? { background: 'var(--geg-btn-orange)', color: 'white', boxShadow: '4px 4px 12px rgba(255,138,101,0.35), inset -2px -2px 5px rgba(0,0,0,0.15), inset 2px 2px 5px rgba(255,255,255,0.35)' } : {}"
+                            :style="isActive(item.route) ? { background: 'var(--geg-primary)', color: 'white', boxShadow: '4px 4px 12px color-mix(in srgb, var(--geg-primary) 50%, transparent), inset -2px -2px 5px rgba(0,0,0,0.15), inset 2px 2px 5px rgba(255,255,255,0.35)' } : {}"
                             @mouseenter="!isActive(item.route) && ($event.currentTarget.style.background='rgba(255,255,255,0.4)')"
                             @mouseleave="!isActive(item.route) && ($event.currentTarget.style.background='transparent')">
                             <span v-html="item.icon" class="w-5 h-5 shrink-0"></span>
@@ -106,7 +107,7 @@
                             <img :src="user.foto_perfil_url" class="w-full h-full object-cover">
                         </div>
                         <div v-else class="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold text-black shrink-0"
-                            :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#f59e0b'}, ${empresa?.color_secundario || empresa?.color || '#f59e0b'})` }">
+                            :style="{ background: `linear-gradient(135deg, ${empresa?.color || '#FFD500'}, ${empresa?.color_secundario || empresa?.color || '#FFD500'})` }">
                             {{ user?.name?.substring(0, 2) }}
                         </div>
                     </div>
@@ -153,6 +154,31 @@ const rootStyle = computed(() => {
         '--geg-primary': base,
         '--geg-primary-dark': empresa.value?.color_secundario || base,
         '--geg-sidebar-bg': secondary,
+    };
+});
+
+function hexToLuma(hex) {
+    if (!hex) return 1;
+    const h = hex.replace('#', '');
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+const sidebarStyle = computed(() => {
+    const secondary = empresa.value?.color_secundario || '#E3DFFD';
+    const luma = hexToLuma(secondary);
+    const textColor = luma > 0.5 ? '#1f2937' : '#ffffff';
+    const textSecondary = luma > 0.5 ? '#6b7280' : '#d1d5db';
+    return {
+        background: 'var(--geg-sidebar-bg)',
+        borderRadius: '0 30px 30px 0',
+        padding: '30px 20px',
+        justifyContent: 'space-between',
+        boxShadow: '10px 10px 20px rgba(0,0,0,0.05), inset -5px -5px 10px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.9)',
+        '--geg-text': textColor,
+        '--geg-text-secondary': textSecondary,
     };
 });
 

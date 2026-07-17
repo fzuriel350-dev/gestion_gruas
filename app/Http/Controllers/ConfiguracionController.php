@@ -14,7 +14,17 @@ class ConfiguracionController extends Controller
     {
         $this->authorize('admin');
         $empresa = Empresa::findOrFail(session('empresa_id'));
-        return Inertia::render('Configuracion/Index', ['empresa' => $empresa]);
+        $empresaArr = $empresa->toArray();
+        if ($empresaArr['logo']) {
+            $empresaArr['logo'] = asset('storage/'.$empresaArr['logo']);
+        }
+        if ($empresaArr['imagen_fondo']) {
+            $empresaArr['imagen_fondo'] = asset('storage/'.$empresaArr['imagen_fondo']);
+        }
+        if ($empresaArr['favicon']) {
+            $empresaArr['favicon'] = asset('storage/'.$empresaArr['favicon']);
+        }
+        return Inertia::render('Configuracion/Index', ['empresa' => $empresaArr]);
     }
 
     public function update(Request $request)

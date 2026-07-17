@@ -95,8 +95,8 @@ const fonts = [
 
 const form = useForm({
     nombre: props.empresa.nombre || '',
-    color: props.empresa.color || '#f59e0b',
-    color_secundario: props.empresa.color_secundario || '',
+    color: props.empresa.color || '#FFD500',
+    color_secundario: props.empresa.color_secundario || '#E6A000',
     tipografia: props.empresa.tipografia || 'Inter',
     moneda: props.empresa.moneda || 'MXN',
     telefono_contacto: props.empresa.telefono_contacto || '',

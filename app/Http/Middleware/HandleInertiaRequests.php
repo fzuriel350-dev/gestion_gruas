@@ -23,6 +23,9 @@ class HandleInertiaRequests extends Middleware
             if ($empresaArr['imagen_fondo']) {
                 $empresaArr['imagen_fondo'] = asset('storage/'.$empresaArr['imagen_fondo']);
             }
+            if ($empresaArr['favicon']) {
+                $empresaArr['favicon'] = asset('storage/'.$empresaArr['favicon']);
+            }
         }
 
         $data = [
