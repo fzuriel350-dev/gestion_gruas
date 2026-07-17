@@ -26,6 +26,7 @@
                         <div>
                             <h2 class="text-lg font-bold">{{ user?.name }}</h2>
                             <p class="text-xs text-gray-500">Haz clic en la foto para cambiarla</p>
+                            <div v-if="profileForm.errors.foto_perfil" class="text-red-500 text-xs mt-1">{{ profileForm.errors.foto_perfil }}</div>
                         </div>
                     </div>
 
@@ -38,7 +39,7 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input v-model="profileForm.email" type="email" class="input w-full" :class="{ 'input-error': profileForm.errors.email }" />
+                                <input v-model="profileForm.email" type="email" class="input w-full" :class="{ 'input-error': profileForm.errors.email }" :disabled="user?.role === 'admin' || user?.role === 'cotizador' || user?.role === 'operador'" />
                                 <div v-if="profileForm.errors.email" class="text-red-500 text-xs mt-1">{{ profileForm.errors.email }}</div>
                             </div>
                         </div>
@@ -63,8 +64,19 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Nueva contraseña</label>
-                                <input v-model="passwordForm.password" type="password" class="input w-full" :class="{ 'input-error': passwordForm.errors.password }" />
+                                <input v-model="passwordForm.password" type="password" class="input w-full" :class="{ 'input-error': passwordForm.errors.password }" @input="passwordForm.errors.password = null" />
                                 <div v-if="passwordForm.errors.password" class="text-red-500 text-xs mt-1">{{ passwordForm.errors.password }}</div>
+                                <div v-if="passwordForm.password.length > 0" class="mt-2 space-y-1">
+                                    <div v-for="rule in passwordRules" :key="rule.label" class="flex items-center gap-2 text-xs">
+                                        <div class="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"
+                                            :class="rule.met ? 'bg-green-500' : 'bg-gray-200'">
+                                            <svg v-if="rule.met" class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </div>
+                                        <span :class="rule.met ? 'text-green-600' : 'text-gray-400'">{{ rule.label }}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar contraseña</label>
@@ -78,7 +90,7 @@
                 </div>
             </div>
 
-            <div class="card border-red-200">
+            <div v-if="user?.role !== 'admin' && user?.role !== 'cotizador' && user?.role !== 'operador'" class="card border-red-200">
                 <div class="card-header">
                     <h3 class="text-red-600">Eliminar cuenta</h3>
                 </div>
@@ -103,11 +115,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { usePage, useForm } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
-const user = usePage().props.auth?.user || usePage().props.user;
+const page = usePage();
+const user = computed(() => page.props.auth?.user || page.props.user);
 
 const fotoPreview = ref(null);
 
@@ -121,8 +134,8 @@ function onFotoChange(e) {
 }
 
 const profileForm = useForm({
-    name: user?.name || '',
-    email: user?.email || '',
+    name: user.value?.name || '',
+    email: user.value?.email || '',
     foto_perfil: null,
 });
 
@@ -132,13 +145,28 @@ const passwordForm = useForm({
     password_confirmation: '',
 });
 
+const hasMinLength = computed(() => passwordForm.password.length >= 8);
+const hasLowercase = computed(() => /[a-z]/.test(passwordForm.password));
+const hasUppercase = computed(() => /[A-Z]/.test(passwordForm.password));
+const hasNumber = computed(() => /[0-9]/.test(passwordForm.password));
+const hasSymbol = computed(() => /[^a-zA-Z0-9]/.test(passwordForm.password));
+
+const passwordRules = computed(() => [
+    { label: 'Mínimo 8 caracteres', met: hasMinLength.value },
+    { label: 'Letras minúsculas', met: hasLowercase.value },
+    { label: 'Letras mayúsculas', met: hasUppercase.value },
+    { label: 'Al menos 1 número', met: hasNumber.value },
+    { label: 'Al menos 1 símbolo', met: hasSymbol.value },
+]);
+
 const deleteForm = useForm({
     password: '',
 });
 
 function updateProfile() {
-    profileForm.patch('/profile', {
+    profileForm.post('/profile', {
         preserveScroll: true,
+        forceFormData: true,
         onSuccess: () => {
             fotoPreview.value = null;
             profileForm.foto_perfil = null;

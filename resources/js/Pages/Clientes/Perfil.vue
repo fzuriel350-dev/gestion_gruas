@@ -68,7 +68,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Email</label>
-                                <input v-model="form.email" type="email" class="form-input" required />
+                                <input v-model="form.email" type="email" class="form-input" disabled />
                                 <InputError :message="form.errors.email" />
                             </div>
                             <div class="form-group" v-if="cliente">
@@ -95,6 +95,17 @@
                                     <label class="form-label">Nueva contraseña</label>
                                     <input v-model="form.password" type="password" class="form-input" autocomplete="new-password" />
                                     <InputError :message="form.errors.password" />
+                                    <div v-if="form.password.length > 0" class="mt-2 space-y-1">
+                                        <div v-for="rule in passwordRules" :key="rule.label" class="flex items-center gap-2 text-xs">
+                                            <div class="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"
+                                                :class="rule.met ? 'bg-green-500' : 'bg-gray-200'">
+                                                <svg v-if="rule.met" class="w-2 h-2 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span :class="rule.met ? 'text-green-600' : 'text-gray-400'">{{ rule.label }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Confirmar contraseña</label>
@@ -140,7 +151,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import InputError from '@/Components/InputError.vue';
@@ -175,6 +186,20 @@ const form = useForm({
     contacto: props.cliente?.contacto || '',
     foto_perfil: null,
 });
+
+const hasMinLength = computed(() => form.password.length >= 8);
+const hasLowercase = computed(() => /[a-z]/.test(form.password));
+const hasUppercase = computed(() => /[A-Z]/.test(form.password));
+const hasNumber = computed(() => /[0-9]/.test(form.password));
+const hasSymbol = computed(() => /[^a-zA-Z0-9]/.test(form.password));
+
+const passwordRules = computed(() => [
+    { label: 'Mínimo 8 caracteres', met: hasMinLength.value },
+    { label: 'Letras minúsculas', met: hasLowercase.value },
+    { label: 'Letras mayúsculas', met: hasUppercase.value },
+    { label: 'Al menos 1 número', met: hasNumber.value },
+    { label: 'Al menos 1 símbolo', met: hasSymbol.value },
+]);
 
 const submit = () => {
     form.post('/panel/perfil', {

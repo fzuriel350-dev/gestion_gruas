@@ -25,7 +25,9 @@ class ProfileController extends Controller
         $user = $request->user();
         $data = $request->validated();
 
-        if (!$user->isAdmin()) {
+        if ($user->isAdmin() || $user->isCotizador() || $user->isOperador()) {
+            unset($data['email']);
+        } else {
             unset($data['name']);
         }
 

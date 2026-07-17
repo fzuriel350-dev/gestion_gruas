@@ -154,5 +154,6 @@ return [
         'empleado_id' => 'empleado',
         'nombre' => 'nombre',
         'telefono' => 'teléfono',
+        'foto_perfil' => 'foto de perfil',
     ],
 ];

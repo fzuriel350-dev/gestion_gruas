@@ -321,14 +321,14 @@ class ClientePanelController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'password' => ['nullable', 'confirmed', Password::defaults()],
+            'password' => ['nullable', 'confirmed', Password::defaults()->mixedCase()->numbers()->symbols()->uncompromised()],
             'telefono' => 'nullable|string|max:20',
             'direccion' => 'nullable|string|max:500',
             'contacto' => 'nullable|string|max:255',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
         ]);
 
-        $data = $request->only(['name', 'email']);
+        $data = $request->only(['name']);
 
         if ($request->hasFile('foto_perfil')) {
             if ($user->foto_perfil) {
