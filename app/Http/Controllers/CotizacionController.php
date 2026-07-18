@@ -158,10 +158,10 @@ class CotizacionController extends Controller
     public function create()
     {
         $empresaId = session('empresa_id');
-        $clientes = Cliente::where('empresa_id', $empresaId)->orderBy('nombre')->get();
-        $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->orderBy('nombre')->get();
+        $clientes = Cliente::where('empresa_id', $empresaId)->with('aseguradora')->orderBy('nombre')->get();
+        $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->with('tiposServicio')->orderBy('nombre')->get();
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
-        $convenios = Convenio::where('empresa_id', $empresaId)->get();
+        $convenios = Convenio::where('empresa_id', $empresaId)->get(['id', 'nombre', 'aseguradora_id', 'tipo_servicio_id', 'costo_banderazo', 'costo_km', 'km_incluidos', 'cubre_casetas_peaje', 'descuento']);
 
         return Inertia::render('Cotizaciones/Create', ['clientes' => $clientes, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio, 'convenios' => $convenios]);
     }
@@ -172,16 +172,27 @@ class CotizacionController extends Controller
             'cliente_id' => ['nullable', 'exists:clientes,id'],
             'aseguradora_id' => ['required', 'exists:aseguradoras,id'],
             'tipo_servicio_id' => ['required', 'exists:tipos_servicio,id'],
-            'origen_direccion' => ['required', 'string', 'max:500', 'regex:/^[\p{L}\p{N}\s\.,#\-\/\'\(\)]+$/u'],
-            'origen_lat' => ['nullable', 'numeric', 'between:-90,90'],
-            'origen_lng' => ['nullable', 'numeric', 'between:-180,180'],
-            'destino_direccion' => ['required', 'string', 'max:500', 'regex:/^[\p{L}\p{N}\s\.,#\-\/\'\(\)]+$/u'],
-            'destino_lat' => ['nullable', 'numeric', 'between:-90,90'],
-            'destino_lng' => ['nullable', 'numeric', 'between:-180,180'],
+            'origen_calle' => ['required', 'string', 'max:255'],
+            'origen_num_exterior' => ['nullable', 'string', 'max:20'],
+            'origen_num_interior' => ['nullable', 'string', 'max:20'],
+            'origen_colonia' => ['required', 'string', 'max:255'],
+            'origen_codigo_postal' => ['required', 'string', 'max:10', 'regex:/^[\d]+$/'],
+            'origen_localidad' => ['required', 'string', 'max:255'],
+            'origen_municipio' => ['required', 'string', 'max:255'],
+            'origen_estado' => ['required', 'string', 'max:255'],
+            'destino_calle' => ['required', 'string', 'max:255'],
+            'destino_num_exterior' => ['nullable', 'string', 'max:20'],
+            'destino_num_interior' => ['nullable', 'string', 'max:20'],
+            'destino_colonia' => ['required', 'string', 'max:255'],
+            'destino_codigo_postal' => ['required', 'string', 'max:10', 'regex:/^[\d]+$/'],
+            'destino_localidad' => ['required', 'string', 'max:255'],
+            'destino_municipio' => ['required', 'string', 'max:255'],
+            'destino_estado' => ['required', 'string', 'max:255'],
             'distancia_km' => ['required', 'numeric', 'min:0.1'],
             'tiempo_estimado_minutos' => ['required', 'integer', 'min:1'],
             'incluye_peajes' => ['boolean'],
-            'costo_aprox_casetas' => ['numeric', 'min:0'],
+            'costo_aprox_casetas' => ['nullable', 'numeric', 'min:0'],
+            'num_casetas' => ['nullable', 'integer', 'min:0'],
             'costo_banderazo' => ['required', 'numeric', 'min:0'],
             'costo_km' => ['required', 'numeric', 'min:0'],
             'convenio_aplicado_id' => ['nullable', 'exists:convenios,id'],
@@ -193,10 +204,20 @@ class CotizacionController extends Controller
     protected function mensajesValidacion(): array
     {
         return [
-            'origen_direccion.required' => 'La dirección de origen es obligatoria.',
-            'origen_direccion.regex' => 'La dirección de origen contiene caracteres no válidos.',
-            'destino_direccion.required' => 'La dirección de destino es obligatoria.',
-            'destino_direccion.regex' => 'La dirección de destino contiene caracteres no válidos.',
+            'origen_calle.required' => 'La calle de origen es obligatoria.',
+            'origen_colonia.required' => 'La colonia de origen es obligatoria.',
+            'origen_codigo_postal.required' => 'El código postal de origen es obligatorio.',
+            'origen_codigo_postal.regex' => 'El código postal de origen solo puede contener números.',
+            'origen_localidad.required' => 'La localidad de origen es obligatoria.',
+            'origen_municipio.required' => 'El municipio de origen es obligatorio.',
+            'origen_estado.required' => 'El estado de origen es obligatorio.',
+            'destino_calle.required' => 'La calle de destino es obligatoria.',
+            'destino_colonia.required' => 'La colonia de destino es obligatoria.',
+            'destino_codigo_postal.required' => 'El código postal de destino es obligatorio.',
+            'destino_codigo_postal.regex' => 'El código postal de destino solo puede contener números.',
+            'destino_localidad.required' => 'La localidad de destino es obligatoria.',
+            'destino_municipio.required' => 'El municipio de destino es obligatorio.',
+            'destino_estado.required' => 'El estado de destino es obligatorio.',
             'distancia_km.required' => 'La distancia es obligatoria.',
             'distancia_km.min' => 'La distancia debe ser mayor a 0.',
             'tiempo_estimado_minutos.required' => 'El tiempo estimado es obligatorio.',
@@ -217,6 +238,7 @@ class CotizacionController extends Controller
         $data['empresa_id'] = session('empresa_id');
         $data['incluye_peajes'] = $request->boolean('incluye_peajes');
         $data['costo_aprox_casetas'] = $request->input('costo_aprox_casetas', 0);
+        $data['num_casetas'] = $request->input('num_casetas', 0);
         $data['usuario_creador_id'] = auth()->id();
         $data['folio'] = $this->generarFolio();
         $data['km_excedente'] = $request->input('km_excedente', 0);
@@ -259,10 +281,10 @@ class CotizacionController extends Controller
     public function edit(Cotizacion $cotizacione)
     {
         $empresaId = session('empresa_id');
-        $clientes = Cliente::where('empresa_id', $empresaId)->orderBy('nombre')->get();
-        $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->orderBy('nombre')->get();
+        $clientes = Cliente::where('empresa_id', $empresaId)->with('aseguradora')->orderBy('nombre')->get();
+        $aseguradoras = Aseguradora::where('empresa_id', $empresaId)->with('tiposServicio')->orderBy('nombre')->get();
         $tiposServicio = TipoServicio::where('empresa_id', $empresaId)->orderBy('nombre')->get();
-        $convenios = Convenio::where('empresa_id', $empresaId)->get();
+        $convenios = Convenio::where('empresa_id', $empresaId)->get(['id', 'nombre', 'aseguradora_id', 'tipo_servicio_id', 'costo_banderazo', 'costo_km', 'km_incluidos', 'cubre_casetas_peaje', 'descuento']);
 
         return Inertia::render('Cotizaciones/Edit', ['cotizacione' => $cotizacione, 'clientes' => $clientes, 'aseguradoras' => $aseguradoras, 'tiposServicio' => $tiposServicio, 'convenios' => $convenios]);
     }
@@ -275,8 +297,11 @@ class CotizacionController extends Controller
 
         $data = $request->validate($this->reglasValidacion(), $this->mensajesValidacion());
 
+        $data['incluye_peajes'] = $request->boolean('incluye_peajes');
+        $data['costo_aprox_casetas'] = $request->input('costo_aprox_casetas', 0);
+        $data['num_casetas'] = $request->input('num_casetas', 0);
+
         $cotizacione->fill($data);
-        $cotizacione->incluye_peajes = $request->boolean('incluye_peajes');
         $cotizacione = $this->calcularCostos($cotizacione);
         $cotizacione->save();
 

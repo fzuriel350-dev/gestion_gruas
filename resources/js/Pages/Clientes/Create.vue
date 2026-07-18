@@ -1,45 +1,92 @@
 <template>
     <AppLayout title="Nuevo Cliente">
         <div class="card max-w-3xl mx-auto">
-            <div class="card-header">
+            <div class="card-header flex items-center justify-between">
                 <h3>Nuevo Cliente</h3>
+                <Link href="/clientes" class="text-sm font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">← Regresar</Link>
             </div>
             <div class="card-body">
-                <form @submit.prevent="submit" class="space-y-5">
+                <form @submit.prevent="submit" novalidate class="space-y-5">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="form-group">
-                            <label class="form-label">Nombre</label>
-                            <input v-model="form.nombre" type="text" class="form-input" required />
-                            <p v-if="errors.nombre" class="form-error">{{ errors.nombre }}</p>
+                            <label class="form-label">Nombre <span class="text-red-500">*</span></label>
+                            <input v-model="form.nombre" type="text" class="form-input" :class="{ 'border-red-500': form.errors.nombre }" @input="validarCampo('nombre')" />
+                            <p v-if="form.errors.nombre" class="form-error">{{ form.errors.nombre }}</p>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Empresa</label>
-                            <input v-model="form.empresa" type="text" class="form-input" />
+                            <label class="form-label">Teléfono <span class="text-red-500">*</span></label>
+                            <input v-model="form.telefono" type="text" class="form-input" :class="{ 'border-red-500': form.errors.telefono }" />
+                            <p v-if="form.errors.telefono" class="form-error">{{ form.errors.telefono }}</p>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Contacto</label>
-                            <input v-model="form.contacto" type="text" class="form-input" />
+                            <label class="form-label">Email <span class="text-red-500">*</span></label>
+                            <input v-model="form.email" type="email" class="form-input" :class="{ 'border-red-500': form.errors.email }" @input="validarCampo('email')" />
+                            <p v-if="form.errors.email" class="form-error">{{ form.errors.email }}</p>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Teléfono</label>
-                            <input v-model="form.telefono" type="text" class="form-input" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Email</label>
-                            <input v-model="form.email" type="email" class="form-input" />
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Aseguradora</label>
-                            <select v-model="form.aseguradora_id" class="form-input">
-                                <option :value="null">Seleccionar...</option>
+                            <label class="form-label">Aseguradora <span class="text-red-500">*</span></label>
+                            <select v-model="form.aseguradora_id" class="form-input" :class="{ 'border-red-500': form.errors.aseguradora_id }">
+                                <option value="">Seleccionar aseguradora...</option>
                                 <option v-for="a in aseguradoras" :key="a.id" :value="a.id">{{ a.nombre }}</option>
                             </select>
+                            <p v-if="form.errors.aseguradora_id" class="form-error">{{ form.errors.aseguradora_id }}</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Póliza <span class="text-red-500">*</span></label>
+                            <input v-model="form.numero_poliza" type="text" class="form-input" :class="{ 'border-red-500': form.errors.numero_poliza }" />
+                            <p v-if="form.errors.numero_poliza" class="form-error">{{ form.errors.numero_poliza }}</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Cobertura <span class="text-red-500">*</span></label>
+                            <input v-model="form.tipo_cobertura_poliza" type="text" class="form-input" :class="{ 'border-red-500': form.errors.tipo_cobertura_poliza }" @input="validarCampo('tipo_cobertura_poliza')" />
+                            <p v-if="form.errors.tipo_cobertura_poliza" class="form-error">{{ form.errors.tipo_cobertura_poliza }}</p>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Dirección</label>
-                        <textarea v-model="form.direccion" class="form-input" rows="3"></textarea>
+
+                    <div class="border-t border-gray-200 pt-5">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-4">Dirección</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="form-group md:col-span-2">
+                                <label class="form-label">Calle <span class="text-red-500">*</span></label>
+                                <input v-model="form.calle" type="text" class="form-input" :class="{ 'border-red-500': form.errors.calle }" @input="validarCampo('calle')" />
+                                <p v-if="form.errors.calle" class="form-error">{{ form.errors.calle }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Núm. Exterior</label>
+                                <input v-model="form.num_exterior" type="text" class="form-input" :class="{ 'border-red-500': form.errors.num_exterior }" @input="validarCampo('num_exterior')" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Núm. Interior</label>
+                                <input v-model="form.num_interior" type="text" class="form-input" :class="{ 'border-red-500': form.errors.num_interior }" @input="validarCampo('num_interior')" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Colonia <span class="text-red-500">*</span></label>
+                                <input v-model="form.colonia" type="text" class="form-input" :class="{ 'border-red-500': form.errors.colonia }" @input="validarCampo('colonia')" />
+                                <p v-if="form.errors.colonia" class="form-error">{{ form.errors.colonia }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Código Postal <span class="text-red-500">*</span></label>
+                                <input v-model="form.codigo_postal" type="text" class="form-input" :class="{ 'border-red-500': form.errors.codigo_postal }" @input="validarCampo('codigo_postal')" />
+                                <p v-if="form.errors.codigo_postal" class="form-error">{{ form.errors.codigo_postal }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Localidad <span class="text-red-500">*</span></label>
+                                <input v-model="form.localidad" type="text" class="form-input" :class="{ 'border-red-500': form.errors.localidad }" @input="validarCampo('localidad')" />
+                                <p v-if="form.errors.localidad" class="form-error">{{ form.errors.localidad }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Municipio <span class="text-red-500">*</span></label>
+                                <input v-model="form.municipio" type="text" class="form-input" :class="{ 'border-red-500': form.errors.municipio }" @input="validarCampo('municipio')" />
+                                <p v-if="form.errors.municipio" class="form-error">{{ form.errors.municipio }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Estado <span class="text-red-500">*</span></label>
+                                <input v-model="form.estado" type="text" class="form-input" :class="{ 'border-red-500': form.errors.estado }" @input="validarCampo('estado')" />
+                                <p v-if="form.errors.estado" class="form-error">{{ form.errors.estado }}</p>
+                            </div>
+                        </div>
                     </div>
+
                     <div class="flex items-center gap-3 pt-2">
                         <button type="submit" class="btn btn-primary" :disabled="form.processing">Guardar</button>
                         <Link href="/clientes" class="btn btn-ghost">Cancelar</Link>
@@ -54,6 +101,7 @@
 import { useForm } from '@inertiajs/vue3';
 import { Link } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     aseguradoras: { type: Array, default: () => [] },
@@ -61,17 +109,127 @@ const props = defineProps({
 
 const form = useForm({
     nombre: '',
-    empresa: '',
-    contacto: '',
     telefono: '',
     email: '',
-    direccion: '',
-    aseguradora_id: null,
+    aseguradora_id: '',
+    numero_poliza: '',
+    tipo_cobertura_poliza: '',
+    calle: '',
+    num_exterior: '',
+    num_interior: '',
+    colonia: '',
+    codigo_postal: '',
+    localidad: '',
+    municipio: '',
+    estado: '',
 });
 
-const errors = {};
+const fieldValidators = {
+    nombre: (v) => v && !/^[A-Z\u00C0-\u00D6\u00D8-\u00DE\u00F1\u00D1]/.test(v) ? 'El nombre debe comenzar con mayúscula.' : '',
+    email: (v) => v && !v.includes('@') ? 'El correo debe contener un @.' : '',
+    codigo_postal: (v) => v && !/^\d+$/.test(v) ? 'El código postal solo puede contener números.' : '',
+    num_exterior: (v) => v && !/^[A-Za-z0-9\s]*$/.test(v) ? 'Solo letras y números.' : '',
+    num_interior: (v) => v && !/^[A-Za-z0-9\s]*$/.test(v) ? 'Solo letras y números.' : '',
+    calle: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+    colonia: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+    localidad: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+    municipio: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+    estado: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+    tipo_cobertura_poliza: (v) => v && !/^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/.test(v) ? 'Solo letras y espacios.' : '',
+};
+
+function validarCampo(key) {
+    const fn = fieldValidators[key];
+    if (!fn) return;
+    const msg = fn(form[key]);
+    if (msg) {
+        form.setError(key, msg);
+    } else {
+        form.errors[key] = undefined;
+    }
+}
+
+const requiredFields = [
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'telefono', label: 'Teléfono' },
+    { key: 'email', label: 'Email' },
+    { key: 'aseguradora_id', label: 'Aseguradora' },
+    { key: 'numero_poliza', label: 'Número de Póliza' },
+    { key: 'tipo_cobertura_poliza', label: 'Tipo de Cobertura' },
+    { key: 'calle', label: 'Calle' },
+    { key: 'colonia', label: 'Colonia' },
+    { key: 'codigo_postal', label: 'Código Postal' },
+    { key: 'localidad', label: 'Localidad' },
+    { key: 'municipio', label: 'Municipio' },
+    { key: 'estado', label: 'Estado' },
+];
+
+function validar() {
+    form.clearErrors();
+    const vacios = [];
+    const invalidos = [];
+
+    for (const field of requiredFields) {
+        if (!form[field.key] || (typeof form[field.key] === 'string' && !form[field.key].trim())) {
+            form.setError(field.key, `El campo "${field.label}" es obligatorio.`);
+            vacios.push(field.label);
+        }
+    }
+
+    if (form.nombre && !/^[A-Z\u00C0-\u00D6\u00D8-\u00DE\u00F1\u00D1]/.test(form.nombre)) {
+        form.setError('nombre', 'El nombre debe comenzar con mayúscula.');
+        invalidos.push('Nombre (debe iniciar con mayúscula)');
+    }
+
+    if (form.email && !form.email.includes('@')) {
+        form.setError('email', 'El correo debe contener un @.');
+        invalidos.push('Email (falta @)');
+    }
+
+    if (form.codigo_postal && !/^\d+$/.test(form.codigo_postal)) {
+        form.setError('codigo_postal', 'El código postal solo puede contener números.');
+        invalidos.push('Código Postal (solo números)');
+    }
+
+    const soloAlfanumerico = /^[A-Za-z0-9\s]*$/;
+    for (const campo of ['num_exterior', 'num_interior']) {
+        if (form[campo] && !soloAlfanumerico.test(form[campo])) {
+            const etiquetas = { num_exterior: 'Núm. Exterior', num_interior: 'Núm. Interior' };
+            form.setError(campo, `${etiquetas[campo]} solo puede contener letras y números.`);
+            invalidos.push(`${etiquetas[campo]} (solo letras/números)`);
+        }
+    }
+
+    const soloLetras = /^[A-Za-z\u00C0-\u024F\u00F1\u00D1\s]+$/;
+    for (const campo of ['calle', 'colonia', 'localidad', 'municipio', 'estado', 'tipo_cobertura_poliza']) {
+        if (form[campo] && !soloLetras.test(form[campo])) {
+            const etiquetas = { calle: 'Calle', colonia: 'Colonia', localidad: 'Localidad', municipio: 'Municipio', estado: 'Estado', tipo_cobertura_poliza: 'Tipo de Cobertura' };
+            form.setError(campo, `${etiquetas[campo]} solo puede contener letras y espacios.`);
+            invalidos.push(`${etiquetas[campo]} (solo letras)`);
+        }
+    }
+
+    if (vacios.length > 0 || invalidos.length > 0) {
+        let texto = '';
+        if (vacios.length > 0) texto += `Campos vacíos: ${vacios.join(', ')}.`;
+        if (invalidos.length > 0) texto += ` Campos inválidos: ${invalidos.join(', ')}.`;
+        Swal.fire({
+            icon: 'error',
+            title: 'Revisa el formulario',
+            text: texto,
+            timer: 4000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+        });
+        return false;
+    }
+
+    return true;
+}
 
 const submit = () => {
+    if (!validar()) return;
     form.post('/clientes');
 };
 </script>

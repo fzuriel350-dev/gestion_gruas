@@ -2,7 +2,7 @@
     <div class="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
         <div v-if="empresa && empresa.imagen_fondo"
             class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            :style="{ backgroundImage: `url(/storage/${empresa.imagen_fondo})` }">
+            :style="{ backgroundImage: `url(${empresa.imagen_fondo})` }">
         </div>
         <div v-if="empresa && empresa.imagen_fondo" class="absolute inset-0 bg-black/60"></div>
         <div v-if="!empresa || !empresa.imagen_fondo" class="absolute inset-0" style="background: linear-gradient(135deg, #000000, #1a1a1a, #0F0F0F);"></div>

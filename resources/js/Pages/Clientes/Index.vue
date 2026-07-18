@@ -18,9 +18,8 @@
                     <thead>
                         <tr>
                             <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Nombre</th>
-                            <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Empresa</th>
-                            <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Contacto</th>
                             <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Teléfono</th>
+                            <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Email</th>
                             <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Aseguradora</th>
                             <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Servicios</th>
                             <th class="px-5 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-gray-500 border-b border-gray-100 bg-gray-50">Acciones</th>
@@ -29,20 +28,20 @@
                     <tbody>
                         <tr v-for="cliente in clientes.data" :key="cliente.id" class="hover:bg-gray-50">
                             <td class="px-5 py-3 text-sm border-b border-gray-50 font-medium">{{ cliente.nombre }}</td>
-                            <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.empresa || '-' }}</td>
-                            <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.contacto || '-' }}</td>
                             <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.telefono || '-' }}</td>
+                            <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.email || '-' }}</td>
                             <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.aseguradora?.nombre || '-' }}</td>
                             <td class="px-5 py-3 text-sm border-b border-gray-50">{{ cliente.servicios_count ?? 0 }}</td>
                             <td class="px-5 py-3 text-sm border-b border-gray-50">
                                 <div class="flex gap-2">
                                     <Link :href="`/clientes/${cliente.id}`" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">Ver</Link>
                                     <Link :href="`/clientes/${cliente.id}/edit`" v-if="$page.props.user?.role === 'admin'" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200">Editar</Link>
+                                    <button v-if="$page.props.user?.role === 'admin'" @click="eliminar(cliente.id)" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border-0 cursor-pointer">Eliminar</button>
                                 </div>
                             </td>
                         </tr>
                         <tr v-if="!clientes.data.length">
-                            <td colspan="7" class="px-5 py-8 text-center text-sm text-gray-400">No se encontraron clientes</td>
+                            <td colspan="6" class="px-5 py-8 text-center text-sm text-gray-400">No se encontraron clientes</td>
                         </tr>
                     </tbody>
                 </table>
@@ -64,10 +63,16 @@
 </template>
 
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 
 defineProps({
     clientes: { type: Object, required: true },
 });
+
+function eliminar(id) {
+    if (confirm('¿Estás seguro de eliminar este cliente? Esta acción no se puede deshacer.')) {
+        router.delete(`/clientes/${id}`);
+    }
+}
 </script>

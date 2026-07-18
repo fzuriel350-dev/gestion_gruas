@@ -32,9 +32,8 @@ class ClienteController extends Controller
         if ($q = request('q')) {
             $query->where(function ($qry) use ($q) {
                 $qry->where('nombre', 'like', "%{$q}%")
-                    ->orWhere('empresa', 'like', "%{$q}%")
-                    ->orWhere('contacto', 'like', "%{$q}%")
-                    ->orWhere('telefono', 'like', "%{$q}%");
+                    ->orWhere('telefono', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
             });
         }
 
@@ -54,9 +53,8 @@ class ClienteController extends Controller
         if ($q = $request->q) {
             $query->where(function ($qry) use ($q) {
                 $qry->where('nombre', 'like', "%{$q}%")
-                    ->orWhere('empresa', 'like', "%{$q}%")
-                    ->orWhere('contacto', 'like', "%{$q}%")
-                    ->orWhere('telefono', 'like', "%{$q}%");
+                    ->orWhere('telefono', 'like', "%{$q}%")
+                    ->orWhere('email', 'like', "%{$q}%");
             });
         }
 
@@ -76,15 +74,20 @@ class ClienteController extends Controller
     protected function reglasValidacion(): array
     {
         return [
-            'nombre' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
-            'empresa' => ['nullable', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
-            'contacto' => ['nullable', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
-            'telefono' => ['nullable', 'string', 'max:20', 'regex:/^[\d\s\-\+\(\)]+$/'],
-            'direccion' => ['nullable', 'string', 'max:500'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'aseguradora_id' => ['nullable', 'exists:aseguradoras,id'],
-            'numero_poliza' => ['nullable', 'string', 'max:50'],
-            'tipo_cobertura_poliza' => ['nullable', 'string', 'max:100'],
+            'nombre' => ['required', 'string', 'max:255', 'regex:/^[\p{Lu}][\p{L}\s]+$/u'],
+            'telefono' => ['required', 'string', 'max:20', 'regex:/^[\d\s\-\+\(\)]+$/'],
+            'email' => ['required', 'email', 'max:255'],
+            'aseguradora_id' => ['required', 'exists:aseguradoras,id'],
+            'numero_poliza' => ['required', 'string', 'max:50'],
+            'tipo_cobertura_poliza' => ['required', 'string', 'max:100', 'regex:/^[\p{L}\s]+$/u'],
+            'calle' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
+            'num_exterior' => ['nullable', 'string', 'max:20', 'regex:/^[\p{L}\p{N}\s]*$/u'],
+            'num_interior' => ['nullable', 'string', 'max:20', 'regex:/^[\p{L}\p{N}\s]*$/u'],
+            'colonia' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
+            'codigo_postal' => ['required', 'string', 'max:10', 'regex:/^[\d]+$/'],
+            'localidad' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
+            'municipio' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
+            'estado' => ['required', 'string', 'max:255', 'regex:/^[\p{L}\s]+$/u'],
         ];
     }
 
@@ -92,14 +95,29 @@ class ClienteController extends Controller
     {
         return [
             'nombre.required' => 'El nombre del cliente es obligatorio.',
-            'nombre.regex' => 'El nombre solo puede contener letras y espacios.',
-            'empresa.regex' => 'El nombre de la empresa solo puede contener letras y espacios.',
-            'contacto.regex' => 'El contacto solo puede contener letras y espacios.',
+            'telefono.required' => 'El teléfono es obligatorio.',
             'telefono.regex' => 'El teléfono solo puede contener números, guiones, paréntesis y signo +.',
-            'numero_poliza.regex' => 'El número de póliza solo puede contener números, guiones, paréntesis y signo +.',
-            'email.email' => 'Ingresa un correo electrónico válido.',
-            'email.unique' => 'Este correo ya está registrado.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'El correo debe contener un @ para ser válido.',
+            'aseguradora_id.required' => 'La aseguradora es obligatoria.',
             'aseguradora_id.exists' => 'La aseguradora seleccionada no es válida.',
+            'calle.required' => 'La calle es obligatoria.',
+            'calle.regex' => 'La calle solo puede contener letras y espacios.',
+            'colonia.required' => 'La colonia es obligatoria.',
+            'colonia.regex' => 'La colonia solo puede contener letras y espacios.',
+            'codigo_postal.required' => 'El código postal es obligatorio.',
+            'numero_poliza.required' => 'El número de póliza es obligatorio.',
+            'tipo_cobertura_poliza.required' => 'El tipo de cobertura es obligatorio.',
+            'tipo_cobertura_poliza.regex' => 'El tipo de cobertura solo puede contener letras y espacios.',
+            'codigo_postal.regex' => 'El código postal solo puede contener números.',
+            'localidad.required' => 'La localidad es obligatoria.',
+            'localidad.regex' => 'La localidad solo puede contener letras y espacios.',
+            'municipio.required' => 'El municipio es obligatorio.',
+            'municipio.regex' => 'El municipio solo puede contener letras y espacios.',
+            'estado.required' => 'El estado es obligatorio.',
+            'estado.regex' => 'El estado solo puede contener letras y espacios.',
+            'num_exterior.regex' => 'El número exterior solo puede contener letras y números.',
+            'num_interior.regex' => 'El número interior solo puede contener letras y números.',
         ];
     }
 

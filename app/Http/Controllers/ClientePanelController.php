@@ -322,10 +322,18 @@ class ClientePanelController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'password' => ['nullable', 'confirmed', Password::defaults()->mixedCase()->numbers()->symbols()->uncompromised()],
-            'telefono' => 'nullable|string|max:20',
-            'direccion' => 'nullable|string|max:500',
-            'contacto' => 'nullable|string|max:255',
+            'telefono' => 'required|string|max:20',
+            'numero_poliza' => 'required|string|max:50',
+            'tipo_cobertura_poliza' => 'required|string|max:100|regex:/^[\p{L}\s]+$/u',
             'foto_perfil' => 'nullable|image|mimes:jpeg,png,gif,webp|max:2048',
+            'calle' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'num_exterior' => 'nullable|string|max:20|regex:/^[\p{L}\p{N}\s]*$/u',
+            'num_interior' => 'nullable|string|max:20|regex:/^[\p{L}\p{N}\s]*$/u',
+            'colonia' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'codigo_postal' => 'required|string|max:10|regex:/^[\d]+$/',
+            'localidad' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'municipio' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
+            'estado' => 'required|string|max:255|regex:/^[\p{L}\s]+$/u',
         ]);
 
         $data = $request->only(['name']);
@@ -345,7 +353,7 @@ class ClientePanelController extends Controller
 
         $cliente = $user->cliente;
         if ($cliente) {
-            $cliente->update($request->only(['telefono', 'direccion', 'contacto']));
+            $cliente->update($request->only(['telefono', 'numero_poliza', 'tipo_cobertura_poliza', 'calle', 'num_exterior', 'num_interior', 'colonia', 'codigo_postal', 'localidad', 'municipio', 'estado']));
         }
 
         return back()->with('success', 'Perfil actualizado correctamente.');

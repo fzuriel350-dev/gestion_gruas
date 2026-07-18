@@ -16,12 +16,36 @@ class Cliente extends Model
         'nombre',
         'empresa',
         'telefono',
-        'direccion',
         'contacto',
         'email',
         'numero_poliza',
         'tipo_cobertura_poliza',
+        'calle',
+        'num_exterior',
+        'num_interior',
+        'colonia',
+        'codigo_postal',
+        'localidad',
+        'municipio',
+        'estado',
     ];
+
+    protected $appends = ['direccion'];
+
+    public function getDireccionAttribute(): ?string
+    {
+        $parts = array_filter([
+            $this->calle,
+            $this->num_exterior ? "Ext. {$this->num_exterior}" : null,
+            $this->num_interior ? "Int. {$this->num_interior}" : null,
+            $this->colonia,
+            $this->codigo_postal,
+            $this->localidad,
+            $this->municipio,
+            $this->estado,
+        ]);
+        return $parts ? implode(', ', $parts) : null;
+    }
 
     public function empresa()
     {

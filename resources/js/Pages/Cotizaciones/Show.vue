@@ -43,7 +43,23 @@
                         </div>
                         <div>
                             <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Convenio</label>
-                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.convenio?.nombre || cotizacione.convenio?.codigo || '-' }}</p>
+                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.convenio?.nombre || '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Distancia</label>
+                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.distancia_km ? cotizacione.distancia_km + ' km' : '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Tiempo estimado</label>
+                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.tiempo_estimado_minutos ? cotizacione.tiempo_estimado_minutos + ' min' : '-' }}</p>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Incluye casetas</label>
+                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.incluye_peajes ? 'Sí' : 'No' }}</p>
+                        </div>
+                        <div v-if="cotizacione.incluye_peajes">
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Casetas</label>
+                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.num_casetas ? cotizacione.num_casetas + ' casetas' : '-' }} / ${{ cotizacione.costo_aprox_casetas || '0' }}</p>
                         </div>
                     </div>
                 </div>
@@ -52,14 +68,24 @@
                     <div class="card-header">
                         <h3>Direcciones</h3>
                     </div>
-                    <div class="card-body grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="card-body grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Origen</label>
-                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.origen_direccion }}</p>
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide block mb-2">Origen</label>
+                            <div class="space-y-1 text-sm text-gray-900">
+                                <p>{{ cotizacione.origen_calle || '-' }}{{ cotizacione.origen_num_exterior ? ' Ext. ' + cotizacione.origen_num_exterior : '' }}{{ cotizacione.origen_num_interior ? ' Int. ' + cotizacione.origen_num_interior : '' }}</p>
+                                <p>{{ cotizacione.origen_colonia ? 'Col. ' + cotizacione.origen_colonia : '' }}</p>
+                                <p>{{ [cotizacione.origen_localidad, cotizacione.origen_municipio, cotizacione.origen_estado].filter(Boolean).join(', ') }}</p>
+                                <p>{{ cotizacione.origen_codigo_postal ? 'C.P. ' + cotizacione.origen_codigo_postal : '' }}</p>
+                            </div>
                         </div>
                         <div>
-                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide">Destino</label>
-                            <p class="text-sm text-gray-900 mt-0.5">{{ cotizacione.destino_direccion }}</p>
+                            <label class="text-xs text-gray-500 font-medium uppercase tracking-wide block mb-2">Destino</label>
+                            <div class="space-y-1 text-sm text-gray-900">
+                                <p>{{ cotizacione.destino_calle || '-' }}{{ cotizacione.destino_num_exterior ? ' Ext. ' + cotizacione.destino_num_exterior : '' }}{{ cotizacione.destino_num_interior ? ' Int. ' + cotizacione.destino_num_interior : '' }}</p>
+                                <p>{{ cotizacione.destino_colonia ? 'Col. ' + cotizacione.destino_colonia : '' }}</p>
+                                <p>{{ [cotizacione.destino_localidad, cotizacione.destino_municipio, cotizacione.destino_estado].filter(Boolean).join(', ') }}</p>
+                                <p>{{ cotizacione.destino_codigo_postal ? 'C.P. ' + cotizacione.destino_codigo_postal : '' }}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
