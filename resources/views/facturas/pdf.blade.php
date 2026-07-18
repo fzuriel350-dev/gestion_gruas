@@ -59,7 +59,13 @@
         <div class="header-left">
             @if($empresa->logo)
                 <div style="margin-bottom:10px;">
-                    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('storage/' . $empresa->logo))) }}" style="max-height:45px;">
+                    @php
+                        $logoPath = public_path('storage/' . $empresa->logo);
+                        $logoSrc = $logoPath && file_exists($logoPath) ? 'data:image/' . pathinfo($logoPath, PATHINFO_EXTENSION) . ';base64,' . base64_encode(file_get_contents($logoPath)) : '';
+                    @endphp
+                    @if($logoSrc)
+                    <img src="{{ $logoSrc }}" style="max-height:45px;">
+                    @endif
                 </div>
             @endif
             <div class="empresa-nombre">{{ $empresa->nombre }}</div>

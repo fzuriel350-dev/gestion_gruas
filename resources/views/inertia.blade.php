@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title inertia>@php $e = \App\Models\Empresa::find(session('empresa_id')) ?? \App\Models\Empresa::first(); echo $e->nombre ?? config('app.name', 'Sistema de Grúas'); @endphp</title>
+    <title inertia>{{ ($empresa->nombre ?? config('app.name', 'Sistema de Grúas')) }}</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
-    @php $favicon = $e?->favicon ? asset('storage/'.$e->favicon) : null; @endphp
+    @php $favicon = $empresa?->imageUrl($empresa->favicon); @endphp
     @if ($favicon)
         <link rel="icon" type="image/png" href="{{ $favicon }}" />
     @endif
@@ -17,11 +17,10 @@
 </head>
 <body class="font-sans antialiased"
     style="@php
-        $emp = \App\Models\Empresa::find(session('empresa_id')) ?? \App\Models\Empresa::first();
-        if ($emp) {
-            $c = $emp->color ?? '#FFD500';
-            $cs = $emp->color_secundario ?? '#E6A000';
-            $font = $emp->tipografia ?? 'Inter';
+        if ($empresa) {
+            $c = $empresa->color ?? '#FFD500';
+            $cs = $empresa->color_secundario ?? '#E6A000';
+            $font = $empresa->tipografia ?? 'Inter';
             echo '--geg-primary: '.$c.'; --geg-primary-dark: '.$cs.'; --geg-yellow: '.$c.'; --geg-yellow-dark: '.$cs.';';
             echo 'font-family: \''.$font.'\', sans-serif;';
         }

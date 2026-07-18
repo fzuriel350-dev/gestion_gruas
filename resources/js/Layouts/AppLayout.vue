@@ -7,11 +7,11 @@
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
             :style="sidebarStyle">
             <div class="flex items-center" style="margin-bottom:32px;padding-left:6px;gap:14px;">
-                <img v-if="empresa?.logo" :src="empresa.logo" style="width:70px;height:70px;border-radius:16px;object-fit:cover;box-shadow:inset -2px -2px 6px rgba(0,0,0,0.15),inset 2px 2px 6px #fff;" />
-                <div v-else style="width:70px;height:70px;background:#A5F3FC;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;color:var(--geg-text);box-shadow:inset -2px -2px 6px rgba(0,0,0,0.15),inset 2px 2px 6px #fff;">
+                <img v-if="empresa?.logo" :src="empresa.logo" style="height:50px;width:auto;max-width:100px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));" />
+                <div v-else style="width:50px;height:50px;min-width:50px;background:#A5F3FC;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:bold;color:var(--geg-text);flex-shrink:0;">
                     {{ empresa?.nombre?.charAt(0) || 'C' }}
                 </div>
-                <span style="font-size:24px;font-weight:bold;color:var(--geg-text);letter-spacing:1px;">{{ empresa?.nombre || 'SIGESGA' }}</span>
+                <span ref="nameRef" :style="'font-weight:bold;color:var(--geg-text);' + nameStyle">{{ empresa?.nombre || 'SIGESGA' }}</span>
             </div>
             <nav class="menu" style="flex-grow:1;overflow-y:auto;">
                 <template v-for="section in sidebarSections" :key="section.title">
@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { usePage, Link } from '@inertiajs/vue3';
 import Swal from 'sweetalert2';
 
@@ -176,7 +176,7 @@ const sidebarStyle = computed(() => {
         borderRadius: '0 30px 30px 0',
         padding: '30px 20px',
         justifyContent: 'space-between',
-        boxShadow: '10px 10px 20px rgba(0,0,0,0.05), inset -5px -5px 10px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.9)',
+        boxShadow: '10px 10px 20px rgba(0,0,0,0.05), inset -5px -5px 10px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.4)',
         '--geg-text': textColor,
         '--geg-text-secondary': textSecondary,
     };
@@ -186,6 +186,40 @@ const roleLabel = computed(() => {
     const labels = { admin: 'Panel de Administración', cotizador: 'Panel de Cotización', operador: 'Panel de Operador', cliente: 'Panel de Cliente' };
     return labels[user.value?.role] || '';
 });
+
+const nameRef = ref(null);
+const nameStyle = ref('font-size:20px;line-height:1.3;word-break:break-word;');
+
+function ajustarNombre() {
+    const el = nameRef.value;
+    if (!el) return;
+    const parent = el.parentElement;
+    const sib = el.previousElementSibling;
+    const logoW = sib ? sib.getBoundingClientRect().width : 50;
+    const maxW = parent.clientWidth - logoW - 14;
+    if (maxW <= 20) return;
+
+    let size = 22;
+    el.style.whiteSpace = 'nowrap';
+    el.style.fontSize = size + 'px';
+    while (el.scrollWidth > maxW && size > 11) {
+        size -= 0.5;
+        el.style.fontSize = size + 'px';
+    }
+    el.style.whiteSpace = size > 11 ? '' : 'normal';
+    nameStyle.value = `font-size:${size}px;line-height:1.3;word-break:break-word;`;
+}
+
+watch(() => empresa.value?.nombre, () => setTimeout(ajustarNombre, 100), { immediate: true });
+
+let resizeObserver;
+onMounted(() => {
+    resizeObserver = new ResizeObserver(() => ajustarNombre());
+    if (nameRef.value?.parentElement) {
+        resizeObserver.observe(nameRef.value.parentElement);
+    }
+});
+onUnmounted(() => resizeObserver?.disconnect());
 
 const notifUrl = computed(() => {
     if (isCliente.value) return '/panel/notificaciones';

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccesoRapidoController;
 use App\Http\Controllers\AseguradoraController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ClientePanelController;
@@ -77,6 +78,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
     Route::post('configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+
+    Route::get('accesos-rapidos', [AccesoRapidoController::class, 'index'])->name('accesos-rapidos.index');
+    Route::post('accesos-rapidos', [AccesoRapidoController::class, 'store'])->name('accesos-rapidos.store');
+    Route::put('accesos-rapidos/{accesosRapido}', [AccesoRapidoController::class, 'update'])->name('accesos-rapidos.update');
+    Route::delete('accesos-rapidos/{accesosRapido}', [AccesoRapidoController::class, 'destroy'])->name('accesos-rapidos.destroy');
 
         Route::prefix('panel')->name('clientes.')->group(function () {
         Route::get('/servicios', [ClientePanelController::class, 'servicios'])->name('servicios');

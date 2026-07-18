@@ -10,6 +10,12 @@ class Empresa extends Model
     use HasFactory;
     protected $fillable = [
         'nombre',
+        'slogan',
+        'quienes_somos',
+        'mision',
+        'vision',
+        'valores',
+        'prioridad',
         'logo',
         'logo_oscuro',
         'imagen_fondo',
@@ -38,6 +44,8 @@ class Empresa extends Model
             'modo_oscuro' => 'boolean',
             'mostrar_precios' => 'boolean',
             'notificaciones_habilitadas' => 'boolean',
+            'valores' => 'array',
+            'prioridad' => 'array',
         ];
     }
 
@@ -104,5 +112,20 @@ class Empresa extends Model
     public function notificaciones()
     {
         return $this->hasMany(Notificacion::class);
+    }
+
+    public function accesosRapidos()
+    {
+        return $this->hasMany(AccesoRapido::class)->orderBy('orden');
+    }
+
+    public function imageUrl(?string $path): ?string
+    {
+        if (!$path) {
+            return null;
+        }
+        $scheme = request()->getScheme();
+        $host = request()->getHttpHost();
+        return "{$scheme}://{$host}/storage/{$path}";
     }
 }

@@ -15,16 +15,26 @@ class ConfiguracionController extends Controller
         $this->authorize('admin');
         $empresa = Empresa::findOrFail(session('empresa_id'));
         $empresaArr = $empresa->toArray();
-        if ($empresaArr['logo']) {
-            $empresaArr['logo'] = asset('storage/'.$empresaArr['logo']);
-        }
-        if ($empresaArr['imagen_fondo']) {
-            $empresaArr['imagen_fondo'] = asset('storage/'.$empresaArr['imagen_fondo']);
-        }
-        if ($empresaArr['favicon']) {
-            $empresaArr['favicon'] = asset('storage/'.$empresaArr['favicon']);
-        }
-        return Inertia::render('Configuracion/Index', ['empresa' => $empresaArr]);
+        $empresaArr['logo'] = $empresa->imageUrl($empresaArr['logo']);
+        $empresaArr['imagen_fondo'] = $empresa->imageUrl($empresaArr['imagen_fondo']);
+        $empresaArr['favicon'] = $empresa->imageUrl($empresaArr['favicon']);
+
+        $accesosRapidos = $empresa->accesosRapidos()->get()->map(function ($a) {
+            return [
+                'id' => $a->id,
+                'titulo' => $a->titulo,
+                'icono' => $a->icono,
+                'icono_imagen_url' => $a->icono_imagen_url,
+                'url' => $a->url,
+                'orden' => $a->orden,
+                'activo' => $a->activo,
+            ];
+        });
+
+        return Inertia::render('Configuracion/Index', [
+            'empresa' => $empresaArr,
+            'accesosRapidos' => $accesosRapidos,
+        ]);
     }
 
     public function update(Request $request)
@@ -32,10 +42,14 @@ class ConfiguracionController extends Controller
         $this->authorize('admin');
         $empresa = Empresa::findOrFail(session('empresa_id'));
 
-        \Log::debug('CONFIG UPDATE PAYLOAD', ['all' => $request->all(), 'method' => $request->method(), 'content_type' => $request->header('Content-Type')]);
-
         $data = $request->validate([
             'nombre' => 'nullable|string|max:150',
+            'slogan' => 'nullable|string|max:255',
+            'quienes_somos' => 'nullable|string',
+            'mision' => 'nullable|string',
+            'vision' => 'nullable|string',
+            'valores' => 'nullable|string',
+            'prioridad' => 'nullable|string',
             'color' => 'nullable|string|max:20',
             'color_secundario' => 'nullable|string|max:20',
             'tipografia' => 'required|string|max:100',
@@ -61,6 +75,15 @@ class ConfiguracionController extends Controller
         $data['mostrar_precios'] = $request->boolean('mostrar_precios');
         $data['notificaciones_habilitadas'] = $request->boolean('notificaciones_habilitadas');
 
+        if ($request->has('valores')) {
+            $valores = $request->input('valores');
+            $data['valores'] = is_string($valores) ? array_filter(array_map('trim', explode("\n", $valores))) : $valores;
+        }
+        if ($request->has('prioridad')) {
+            $prioridad = $request->input('prioridad');
+            $data['prioridad'] = is_string($prioridad) ? array_filter(array_map('trim', explode("\n", $prioridad))) : $prioridad;
+        }
+
         if (empty($data['nombre'])) {
             $data['nombre'] = $empresa->nombre;
         }
@@ -77,11 +100,14 @@ class ConfiguracionController extends Controller
         }
         if ($request->hasFile('favicon')) {
             $data['favicon'] = $request->file('favicon')->store('empresas', 'public');
+        } else {
+            unset($data['favicon']);
         }
 
         $empresa->update($data);
 
         Cache::forget("empresa_{$empresa->id}");
+        Cache::forget('empresa_default');
         Cache::forget("servicios_activos_{$empresa->id}");
 
         return redirect()->route('configuracion.index')

@@ -2,7 +2,9 @@
     <AppLayout title="Mi Perfil">
         <div class="max-w-4xl mx-auto space-y-6">
             <div class="flex items-center gap-4">
-                <img v-if="$page.props.empresa?.logo" :src="$page.props.empresa.logo" class="w-10 h-10 object-contain rounded-lg shrink-0">
+                <div v-if="$page.props.empresa?.logo" class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background:#f0f0f0;">
+                    <img :src="$page.props.empresa.logo" style="height:36px;width:auto;max-width:48px;object-fit:contain;">
+                </div>
                 <div class="flex-1">
                     <h2 class="text-lg font-bold text-gray-900">{{ $page.props.empresa?.nombre || 'Grúas & Equipos' }}</h2>
                     <p class="text-xs text-gray-500">Cliente</p>

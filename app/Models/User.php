@@ -30,7 +30,12 @@ class User extends Authenticatable
 
     public function getFotoPerfilUrlAttribute(): ?string
     {
-        return $this->foto_perfil ? asset('storage/'.$this->foto_perfil) : null;
+        if (!$this->foto_perfil) {
+            return null;
+        }
+        $scheme = request()->getScheme();
+        $host = request()->getHttpHost();
+        return "{$scheme}://{$host}/storage/{$this->foto_perfil}";
     }
 
     protected $hidden = [

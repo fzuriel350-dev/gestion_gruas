@@ -28,10 +28,10 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             $empresa = null;
             if ($empresaId = session('empresa_id')) {
-                $empresa = Cache::remember("empresa_{$empresaId}", 600, fn() => Empresa::find($empresaId));
+                $empresa = Cache::remember("empresa_{$empresaId}", 60, fn() => Empresa::find($empresaId));
             }
             if (!$empresa) {
-                $empresa = Cache::remember('empresa_default', 600, fn() => Empresa::first());
+                $empresa = Cache::remember('empresa_default', 60, fn() => Empresa::first());
             }
 
             $fechaFormato = $empresa->formato_fecha ?? 'd/m/Y';

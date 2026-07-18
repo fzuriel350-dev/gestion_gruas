@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Servicio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -12,20 +13,16 @@ class HandleInertiaRequests extends Middleware
 
     public function share(Request $request): array
     {
-        $empresa = \App\Models\Empresa::find(session('empresa_id'))
-            ?? \App\Models\Empresa::first();
+        $empresaId = session('empresa_id');
+        $empresa = $empresaId
+            ? Cache::remember("empresa_{$empresaId}", 60, fn() => \App\Models\Empresa::find($empresaId))
+            : Cache::remember('empresa_default', 60, fn() => \App\Models\Empresa::first());
 
         $empresaArr = $empresa ? $empresa->toArray() : null;
         if ($empresaArr) {
-            if ($empresaArr['logo']) {
-                $empresaArr['logo'] = asset('storage/'.$empresaArr['logo']);
-            }
-            if ($empresaArr['imagen_fondo']) {
-                $empresaArr['imagen_fondo'] = asset('storage/'.$empresaArr['imagen_fondo']);
-            }
-            if ($empresaArr['favicon']) {
-                $empresaArr['favicon'] = asset('storage/'.$empresaArr['favicon']);
-            }
+            $empresaArr['logo'] = $empresa->imageUrl($empresaArr['logo']);
+            $empresaArr['imagen_fondo'] = $empresa->imageUrl($empresaArr['imagen_fondo']);
+            $empresaArr['favicon'] = $empresa->imageUrl($empresaArr['favicon']);
         }
 
         $data = [
